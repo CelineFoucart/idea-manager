@@ -5,7 +5,14 @@
 </template>
 
 <script>
+import { datetimeMixin } from '../utils/datetimeMixin';
+
 export default {
-    name: 'Dashboard'
+    name: 'Dashboard',
+    mixins: [datetimeMixin],
+
+    mounted() {
+        console.log(this.formatDateTime());
+    }
 };
 </script>
