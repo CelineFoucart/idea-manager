@@ -1,12 +1,66 @@
-import { Manager } from './database/Manager';
+import Datastore from '@seald-io/nedb';
 
-const ideaManager = new Manager('data/ideas.db', true);
-const categoryManager = new Manager('data/categories.db', true);
+const ideaDB = new Datastore({ filename: 'data/ideas.db', autoload: true });
+const categoryDB = new Datastore({ filename: 'data/categories.db', autoload: true });
 
 /**
  * Custom APIs for renderer
  */
 export const api = {
-    ideaManager: ideaManager,
-    categoryManager: categoryManager
+    ideaDB: {
+        findBy: async (params = {}) => {
+            return await ideaDB.findAsync(params);
+        },
+
+        findOne: async (id) => {
+            return await ideaDB.findOneAsync({ _id: id });
+        },
+
+        append: async (data) => {
+            return await ideaDB.insertAsync(data);
+        },
+
+        update: async (data, id) => {
+            await ideaDB.updateAsync({ _id: id }, { $set: data }, { upsert: true });
+            ideaDB.loadDatabase();
+
+            return true;
+        },
+
+        remove: async (id) => {
+            await ideaDB.removeAsync({ _id: id }, {});
+            ideaDB.loadDatabase();
+
+            return true;
+        }
+    },
+    categoryDB: {
+        findBy: async (params = {}) => {
+            return await categoryDB.findAsync(params).sort({ name: 1 });
+        },
+
+        append: async (data) => {
+            return await categoryDB.insertAsync(data);
+        },
+
+        update: async (data, categoryId) => {
+            await categoryDB.updateAsync({ _id: categoryId }, { $set: data }, { upsert: true });
+            categoryDB.loadDatabase();
+
+            return true;
+        },
+
+        remove: async (categoryId) => {
+            const count = await ideaDB.countAsync({ category: categoryId });
+
+            if (count !== 0) {
+                return false;
+            }
+
+            await categoryDB.removeAsync({ _id: categoryId }, {});
+            categoryDB.loadDatabase();
+
+            return true;
+        }
+    }
 };
