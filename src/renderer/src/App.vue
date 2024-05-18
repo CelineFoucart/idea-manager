@@ -7,7 +7,7 @@ import Navbar from './components/Navbar.vue';
         <Navbar></Navbar>
     </div>
 
-    <main id="main" class="py-2">
+    <main id="main" class="pb-2">
         <div class="container-fluid">
             <router-view></router-view>
         </div>

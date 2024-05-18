@@ -1,6 +1,8 @@
 <template>
     <article>
-        <h2>Tableau de bord</h2>
+        <header class="mb-4">
+            <h2 class="display-3 fw-normal mb-1">Tableau de bord</h2>
+        </header>
     </article>
 </template>
 
@@ -9,10 +11,6 @@ import { datetimeMixin } from '../utils/datetimeMixin';
 
 export default {
     name: 'Dashboard',
-    mixins: [datetimeMixin],
-
-    mounted() {
-        console.log(this.formatDateTime());
-    }
+    mixins: [datetimeMixin]
 };
 </script>
