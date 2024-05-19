@@ -34,6 +34,7 @@ export const api = {
             return true;
         }
     },
+
     categoryDB: {
         findBy: async (params = {}) => {
             return await categoryDB.findAsync(params).sort({ name: 1 });

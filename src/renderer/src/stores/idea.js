@@ -38,29 +38,21 @@ export const useIdeaStore = defineStore('idea', {
 
         async remove(ideaId) {
             try {
-                const status = await window.api.ideaDB.remove(ideaId);
-                if (!status) {
-                    return false;
-                }
-
+                await window.api.ideaDB.remove(ideaId);
                 const index = this.ideas.findIndex((element) => element._id === ideaId);
                 if (index !== -1) {
                     this.ideas.splice(index, 1);
                 }
-
                 return true;
             } catch (error) {
+                console.log(error);
                 return false;
             }
         },
 
         async update(data, ideaId) {
             try {
-                const isEdited = await window.api.ideaDB.update(data, ideaId);
-                if (!isEdited) {
-                    return false;
-                }
-
+                await window.api.ideaDB.update(data, ideaId);
                 const index = this.ideas.findIndex((element) => element._id === ideaId);
                 if (index !== -1) {
                     data._id = ideaId;
