@@ -9,25 +9,61 @@
                         <button type="button" class="btn-close" aria-label="fermeture" @click.prevent="closeModal"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="title" class="form-label required">Titre</label>
-                            <input
-                                id="title"
-                                v-model="title"
-                                type="text"
-                                class="form-control"
-                                :class="{ 'is-invalid': v$.title.$errors.length }"
-                            />
-                            <div class="invalid-feedback">Ce champ est obligatoire et doit faire entre 2 et 255 caractères.</div>
-                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label required">Titre</label>
+                                    <input
+                                        id="title"
+                                        v-model="title"
+                                        type="text"
+                                        class="form-control"
+                                        :class="{ 'is-invalid': v$.title.$errors.length }"
+                                    />
+                                    <div class="invalid-feedback">
+                                        Ce champ est obligatoire et doit faire entre 2 et 255 caractères.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="date" class="form-label required">Date</label>
+                                    <VueDatePicker
+                                        id="date"
+                                        v-model="date"
+                                        locale="fr"
+                                        :format="format"
+                                        :enable-time-picker="false"
+                                        auto-apply
+                                        required
+                                    />
+                                </div>
+                                <div v-if="v$.date.$errors.length" class="text-danger small">Ce champ est obligatoire.</div>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="categories" class="form-label">Catégorie</label>
-                            <select id="categories" v-model="category" class="form-select">
-                                <option v-for="item in categoryStore.categories" :key="item._id" :value="item._id">
-                                    {{ item.name }}
-                                </option>
-                            </select>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="categories" class="form-label">Catégorie</label>
+                                    <select id="categories" v-model="category" class="form-select">
+                                        <option v-for="item in categoryStore.categories" :key="item._id" :value="item._id">
+                                            {{ item.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="mb-3">
+                                        <label for="categories" class="form-label">Statut</label>
+                                        <select id="categories" v-model="status" class="form-select">
+                                            <option value="0">En brouillon</option>
+                                            <option value="1">A faire</option>
+                                            <option value="2">Validé</option>
+                                            <option value="3">Annulé</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -47,23 +83,11 @@
                             <div class="invalid-feedback">Ce champ doit faire entre 3 et 1500 caractères.</div>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3 border rounded p-2">
                             <label for="note" class="form-label">
                                 Note : <strong>{{ note }}/5</strong>
                             </label>
                             <input id="note" v-model="note" type="range" class="form-range" min="0" max="5" step="1" />
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="mb-3">
-                                <label for="categories" class="form-label">Statut</label>
-                                <select id="categories" v-model="status" class="form-select">
-                                    <option value="0">En brouillon</option>
-                                    <option value="1">A faire</option>
-                                    <option value="2">Validé</option>
-                                    <option value="3">Annulé</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -76,6 +100,8 @@
 </template>
 
 <script>
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 import { mapStores } from 'pinia';
 import { useCategoryStore } from '../stores/category';
 import { useIdeaStore } from '../stores/idea';
@@ -86,6 +112,10 @@ import dayjs from 'dayjs';
 
 export default {
     name: 'IdeaModal',
+
+    components: {
+        VueDatePicker,
+    },
 
     props: {
         idea: {
@@ -98,6 +128,7 @@ export default {
 
     data() {
         return {
+            date: null,
             title: null,
             keywords: null,
             description: null,
@@ -117,12 +148,14 @@ export default {
             title: { required, maxLength: maxLength(255), minLength: minLength(2) },
             description: { maxLength: maxLength(1500), minLength: minLength(3) },
             note: { required, minValue: minValue(0), maxValue: maxValue(5) },
-            status: { required, minValue: minValue(0), maxValue: maxValue(3) }
+            status: { required, minValue: minValue(0), maxValue: maxValue(3) },
+            date: { required }
         };
     },
 
     mounted() {
         if (this.idea !== null) {
+            this.date = this.idea.date;
             this.title = this.idea.title;
             this.keywords = this.idea.keywords;
             this.description = this.idea.description;
@@ -137,6 +170,10 @@ export default {
             this.$emit('on-close');
         },
 
+        format(date) {
+            return dayjs(date).format('DD/MM/YYYY');
+        },
+
         async save() {
             this.loading = true;
             const result = await this.v$.$validate();
@@ -148,7 +185,7 @@ export default {
             }
 
             const data = {
-                date: this.idea !== null ? this.idea.date : dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                date: dayjs(this.date).format('YYYY-MM-DD HH:mm:ss'),
                 title: this.title,
                 keywords: this.keywords,
                 category: this.category,

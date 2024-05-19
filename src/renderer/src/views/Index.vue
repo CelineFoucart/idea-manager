@@ -1,8 +1,8 @@
 <template>
     <article>
         <header class="mb-4">
-            <h2 class="display-3 fw-normal mb-1">Liste des idées</h2>
-            <p class="fs-5 fw-normal text-muted">Retrouvez et fitrez vos idées sur cet onglet.</p>
+            <h1 class="display-3 fw-normal mb-1">Liste des idées</h1>
+            <p class="fs-5 fw-normal text-muted">Retrouvez et fitrez les idées que vous avez ajouté à l'application.</p>
         </header>
 
         <aside class="mb-1 text-end">
@@ -15,10 +15,19 @@
         <div class="card">
             <div class="card-header">
                 <div class="row">
-                    <div class="col-md-6">
-                        <!-- filtre par date -->
+                    <div class="col-md-4 d-flex align-items-center gap-2">
+                        <label for="daterange" class="fw-bold">Période</label>
+                        <VueDatePicker
+                            id="daterange"
+                            v-model="dates"
+                            locale="fr"
+                            :format="format"
+                            auto-apply
+                            :enable-time-picker="false"
+                            range
+                        ></VueDatePicker>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-8">
                         <!-- filtre note, statut, categ -->
                     </div>
                 </div>
@@ -42,6 +51,7 @@
                         </tr>
                     </thead>
                     <template #column-date="props">
+                        <div class="d-none">{{ props.cellData }}</div>
                         {{ formatDateTime(props.cellData) }}
                     </template>
                     <template #column-status="props">
@@ -86,6 +96,8 @@
 </template>
 
 <script>
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 import { mapStores } from 'pinia';
 import { datetimeMixin } from '../utils/datetimeMixin';
 import { useIdeaStore } from '../stores/idea';
@@ -96,6 +108,9 @@ import DataTablesCore from 'datatables.net-bs5';
 import language from '../utils/fr-FR.json';
 import IdeaModal from '../components/IdeaModal.vue';
 import DeleteModal from '../components/DeleteModal.vue';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+dayjs.extend(isBetween);
 
 DataTable.use(DataTablesCore);
 
@@ -105,7 +120,8 @@ export default {
     components: {
         DataTable,
         IdeaModal,
-        DeleteModal
+        DeleteModal,
+        VueDatePicker
     },
 
     mixins: [datetimeMixin],
@@ -113,6 +129,7 @@ export default {
     data() {
         return {
             statusNames: ['en brouillon', 'à faire', 'validé', 'annulé'],
+            dates: null,
             columns: [
                 { data: 'date', name: 'date' },
                 { data: 'title', name: 'title' },
@@ -136,13 +153,23 @@ export default {
             const ideas = [];
 
             this.ideaStore.ideas.forEach((idea) => {
-                if (this.categories[idea.category]) {
-                    idea.categoryName = this.categories[idea.category].name;
-                } else {
-                    idea.categoryName = null;
+                let appendTo = true;
+
+                if (this.dates !== null && this.dates.length === 2) {
+                    const start = dayjs(this.dates[0]).startOf('day');
+                    const end = dayjs(this.dates[1]).endOf('day');
+                    appendTo = dayjs(idea.date).isBetween(start, end);
                 }
 
-                ideas.push(idea);
+                if (appendTo) {
+                    if (this.categories[idea.category]) {
+                        idea.categoryName = this.categories[idea.category].name;
+                    } else {
+                        idea.categoryName = null;
+                    }
+
+                    ideas.push(idea);
+                }
             });
 
             return ideas;
@@ -174,6 +201,12 @@ export default {
     methods: {
         show(id) {
             console.log(id);
+        },
+
+        format(dates) {
+            const start = dayjs(dates[0]).format('DD/MM/YYYY');
+            const end = dayjs(dates[1]).format('DD/MM/YYYY');
+            return start + ' - ' + end;
         },
 
         onShowEditModal(idea = null) {

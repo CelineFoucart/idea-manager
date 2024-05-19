@@ -1,6 +1,6 @@
 <template>
     <article>
-        <h2>Voir une idée</h2>
+        <h1>Voir une idée</h1>
     </article>
 </template>
 

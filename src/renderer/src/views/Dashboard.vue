@@ -1,7 +1,7 @@
 <template>
     <article>
         <header class="mb-4">
-            <h2 class="display-3 fw-normal mb-1">Tableau de bord</h2>
+            <h1 class="display-3 fw-normal mb-1">Tableau de bord</h1>
         </header>
     </article>
 </template>

@@ -3,11 +3,8 @@ import Navbar from './components/Navbar.vue';
 </script>
 
 <template>
-    <div id="sidebar">
-        <Navbar></Navbar>
-    </div>
-
-    <main id="main" class="pb-2">
+    <Navbar></Navbar>
+    <main id="main" class="py-2">
         <div class="container-fluid">
             <router-view></router-view>
         </div>
