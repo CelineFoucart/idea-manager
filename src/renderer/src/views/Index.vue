@@ -162,8 +162,8 @@ export default {
                 }
 
                 if (appendTo) {
-                    if (this.categories[idea.category]) {
-                        idea.categoryName = this.categories[idea.category].name;
+                    if (this.categoryStore.categories[idea.category]) {
+                        idea.categoryName = this.categoryStore.categories[idea.category].name;
                     } else {
                         idea.categoryName = null;
                     }
@@ -173,16 +173,6 @@ export default {
             });
 
             return ideas;
-        },
-
-        categories() {
-            const categories = {};
-
-            this.categoryStore.categories.forEach((category) => {
-                categories[category._id] = category;
-            });
-
-            return categories;
         }
     },
 
@@ -200,7 +190,7 @@ export default {
 
     methods: {
         show(id) {
-            console.log(id);
+            this.$router.push('/ideas/' + id);
         },
 
         format(dates) {

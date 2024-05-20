@@ -2,13 +2,19 @@ import { defineStore } from 'pinia';
 
 export const useCategoryStore = defineStore('category', {
     state: () => ({
-        categories: []
+        categories: {}
     }),
 
     actions: {
         async getCategories() {
             try {
-                this.categories = await window.api.categoryDB.findBy({});
+                const docs = await window.api.categoryDB.findBy({});
+                this.categories = {};
+
+                docs.forEach((category) => {
+                    this.categories[category._id] = category;
+                });
+
                 return true;
             } catch (error) {
                 return false;

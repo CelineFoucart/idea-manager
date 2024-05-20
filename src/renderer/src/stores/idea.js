@@ -18,10 +18,13 @@ export const useIdeaStore = defineStore('idea', {
         },
 
         async findOne(id) {
+            this.idea = null;
             try {
-                this.idea = await window.api.ideaDB.findOneAsync({ _id: id });
+                this.idea = await window.api.ideaDB.findOne(id);
+                return true;
             } catch (error) {
-                return null;
+                console.log(error);
+                return false;
             }
         },
 
@@ -45,7 +48,6 @@ export const useIdeaStore = defineStore('idea', {
                 }
                 return true;
             } catch (error) {
-                console.log(error);
                 return false;
             }
         },
@@ -54,9 +56,15 @@ export const useIdeaStore = defineStore('idea', {
             try {
                 await window.api.ideaDB.update(data, ideaId);
                 const index = this.ideas.findIndex((element) => element._id === ideaId);
+                data._id = ideaId;
                 if (index !== -1) {
-                    data._id = ideaId;
                     this.ideas[index] = data;
+                }
+
+                console.log(this.idea);
+
+                if (this.idea !== null) {
+                    this.idea = data;
                 }
 
                 return true;
