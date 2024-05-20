@@ -50,7 +50,11 @@
             <IdeaModal v-if="editModal" :idea="ideaStore.idea" @on-close="editModal = false"></IdeaModal>
         </header>
 
-        <div class="bg-white rounded p-2 mt-3 shadow-sm">contenu ici</div>
+        <div class="bg-white rounded p-2 mt-3 shadow-sm">
+            <label for="contentTextarea" class="label-form mb-1 fw-bold">Contenu</label>
+            <textarea id="contentTextarea" v-model="content"></textarea>
+            <button type="button" class="btn btn-sm btn-success mt-2" @click="save">Sauvegarder</button>
+        </div>
     </article>
 </template>
 
@@ -61,6 +65,7 @@ import { mapStores } from 'pinia';
 import { createToastify } from '../utils/toastify';
 import { datetimeMixin } from '../utils/datetimeMixin';
 import IdeaModal from '../components/IdeaModal.vue';
+import tinymce from 'tinymce';
 
 export default {
     name: 'Show',
@@ -73,7 +78,8 @@ export default {
 
     data() {
         return {
-            editModal: false
+            editModal: false,
+            content: null
         };
     },
 
@@ -122,6 +128,98 @@ export default {
         const status = await this.ideaStore.findOne(ideaId);
         if (!status) {
             createToastify("L'idée n'a pas été trouvé", 'error');
+            return;
+        }
+
+        this.content = this.ideaStore.idea.content;
+        tinymce.init({
+            selector: '#contentTextarea',
+            license_key: 'gpl',
+            language: 'fr_FR',
+            highlight_on_focus: false,
+            skin: 'tinymce-5',
+            branding: false,
+            promotion: false,
+            insertdatetime_formats: ['%H:%M:%S', '%d/%m/%Y', '%d/%m/%Y %H:%M:%S'],
+            quickbars_insert_toolbar: 'quicktable quicklink | hr pagebreak | bullist numlist',
+            contextmenu:
+                'alignleft aligncenter alignright alignjustify | bold italic underline strikethrough | forecolor backcolor fontsizes | image link table | selectall cut copy paste removeformat',
+            quickbars_selection_toolbar: 'bold italic underline strikethrough bullist quicklink blockquote quicktable',
+            toolbar:
+                'undo redo |' +
+                'blocks | fontsizeinput | bold italic underline strikethrough align | bullist numlist blockquote link quicktable |' +
+                'lineheight  outdent indent | forecolor backcolor |' +
+                'removeformat fullscreen help',
+            menu: {
+                file: {
+                    title: 'File',
+                    items: 'code wordcount | visualaid visualchars visualblocks | preview fullscreen | newdocument print '
+                },
+                edit: { title: 'Edit', items: 'undo redo | cut copy paste removeformat | selectall | searchreplace' },
+                insert: {
+                    title: 'Insert',
+                    items: 'image link media template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor toc | insertdatetime'
+                },
+                format: {
+                    title: 'Format',
+                    items: 'bold italic underline strikethrough superscript subscript codeformat | blocks fontfamily fontsize align lineheight | forecolor backcolor | removeformat'
+                },
+                table: { title: 'Table', items: 'inserttable | cell row column | tableprops deletetable' }
+            },
+            menubar: 'file format edit insert table',
+            plugins: [
+                'advlist',
+                'anchor',
+                'autolink',
+                'charmap',
+                'fullscreen',
+                'help',
+                'image',
+                'importcss',
+                'link',
+                'lists',
+                'media',
+                'nonbreaking',
+                'preview',
+                'quickbars',
+                'searchreplace',
+                'table',
+                'visualblocks',
+                'visualchars',
+                'wordcount',
+                'emoticons',
+                'insertdatetime'
+            ]
+        });
+    },
+
+    unmounted() {
+        tinymce.activeEditor.destroy();
+    },
+    
+
+    methods: {
+        async save() {
+            this.content = tinymce.activeEditor.getContent('contentTextarea');
+            const data = {
+                date: this.ideaStore.idea.date,
+                title: this.ideaStore.idea.title,
+                keywords: this.ideaStore.idea.keywords,
+                category: this.ideaStore.idea.category,
+                description: this.ideaStore.idea.description,
+                content: this.content,
+                note: this.ideaStore.idea.note,
+                status: this.ideaStore.idea.status,
+                sticky: this.ideaStore.idea.sticky,
+                todos: Array.from(this.ideaStore.idea.todos)
+            };
+
+            const status = await this.ideaStore.update(data, this.ideaStore.idea._id);
+            if (!status) {
+                createToastify('Le formulaire comporte des erreurs.', 'error');
+            } else {
+                createToastify("L'idée a été sauvegardée.", 'success');
+            }
         }
     }
 };

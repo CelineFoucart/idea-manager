@@ -61,8 +61,6 @@ export const useIdeaStore = defineStore('idea', {
                     this.ideas[index] = data;
                 }
 
-                console.log(this.idea);
-
                 if (this.idea !== null) {
                     this.idea = data;
                 }
