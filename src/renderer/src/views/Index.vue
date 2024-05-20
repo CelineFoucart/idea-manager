@@ -28,7 +28,20 @@
                         ></VueDatePicker>
                     </div>
                     <div class="col-md-8">
-                        <!-- filtre note, statut, categ -->
+                        <!-- filtre note, categ -->
+                        <VueMultiselect
+                            v-model="statusSelected"
+                            :options="optionsStatus"
+                            :allow-empty="false"
+                            :multiple="true"
+                            :close-on-select="true"
+                            placeholder="Choisir les statuts"
+                            select-label="Appuyer sur entrée pour choisir"
+                            selected-label="Sélectionné"
+                            deselect-label="Appuyer sur entrée pour enlever"
+                            label="name"
+                            track-by="code"
+                        />
                     </div>
                 </div>
             </div>
@@ -109,6 +122,8 @@ import DeleteModal from '../components/DeleteModal.vue';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import StatusIdea from '../components/StatusIdea.vue';
+import VueMultiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.css';
 dayjs.extend(isBetween);
 
 DataTable.use(DataTablesCore);
@@ -121,7 +136,8 @@ export default {
         IdeaModal,
         DeleteModal,
         VueDatePicker,
-        StatusIdea
+        StatusIdea,
+        VueMultiselect
     },
 
     mixins: [datetimeMixin],
@@ -129,6 +145,8 @@ export default {
     data() {
         return {
             statusNames: ['en brouillon', 'à faire', 'validé', 'annulé'],
+            optionsStatus: [],
+            statusSelected: [],
             dates: null,
             columns: [
                 { data: 'date', name: 'date' },
@@ -150,6 +168,10 @@ export default {
         ...mapStores(useIdeaStore, useCategoryStore),
 
         ideas() {
+            const status = [];
+            this.statusSelected.forEach(selected => {
+                status.push(selected.code);
+            });
             const ideas = [];
 
             this.ideaStore.ideas.forEach((idea) => {
@@ -160,6 +182,8 @@ export default {
                     const end = dayjs(this.dates[1]).endOf('day');
                     appendTo = dayjs(idea.date).isBetween(start, end);
                 }
+
+                appendTo = status.includes(parseInt(idea.status));
 
                 if (appendTo) {
                     if (this.categoryStore.categories[idea.category]) {
@@ -177,6 +201,16 @@ export default {
     },
 
     async mounted() {
+        this.optionsStatus = [];
+        this.statusSelected = [];
+        for (let i = 0; i < this.statusNames.length; i++) {
+            const option = { name: this.statusNames[i], code: i };
+            this.optionsStatus.push(option);
+            if (i < 3) {
+                this.statusSelected.push(option);
+            }
+        }
+
         this.ideaStore.setOnlySticky(false);
         const status = await this.ideaStore.getIdeas();
         if (!status) {
