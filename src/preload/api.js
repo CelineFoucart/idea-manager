@@ -9,7 +9,7 @@ const categoryDB = new Datastore({ filename: 'data/categories.db', autoload: tru
 export const api = {
     ideaDB: {
         findBy: async (params = {}) => {
-            return await ideaDB.findAsync(params);
+            return await ideaDB.findAsync(params).sort({ title: 1 });
         },
 
         findOne: async (id) => {
