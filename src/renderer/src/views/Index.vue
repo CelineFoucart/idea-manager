@@ -27,8 +27,8 @@
                             range
                         ></VueDatePicker>
                     </div>
-                    <div class="col-md-8">
-                        <!-- filtre note, categ -->
+                    <div class="col-md-6 d-flex align-items-center gap-2">
+                        <span class="fw-bold">Statut</span>
                         <VueMultiselect
                             v-model="statusSelected"
                             :options="optionsStatus"
@@ -43,6 +43,57 @@
                             track-by="code"
                         />
                     </div>
+                    <div class="col-md-2">
+                        <div class="dropdown h-100">
+                            <button
+                                class="btn btn-outline-success h-100 w-100 dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                Catégories
+                            </button>
+                            <div class="dropdown-menu w-100">
+                                <div class="form-check ms-2">
+                                    <input id="checkAll" v-model="checkAll" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label fw-bold" for="checkAll"> Tout cocher</label>
+                                </div>
+                                <div class="p-2">
+                                    <input
+                                        id="search"
+                                        v-model="categorySearch"
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="filtrer..."
+                                    />
+                                </div>
+                                <hr class="mb-0 mt-2" size />
+                                <div class="categoryContainer pt-2">
+                                    <div class="form-check ms-3">
+                                        <input
+                                            id="check0"
+                                            v-model="selectedCategories['0']"
+                                            class="form-check-input"
+                                            type="checkbox"
+                                        />
+                                        <label class="form-check-label fw-bold" for="check0">Sans catégorie</label>
+                                    </div>
+                                    <div v-for="category in categories" :key="category._id" class="form-check ms-3">
+                                        <input
+                                            :id="'check' + category._id"
+                                            v-model="selectedCategories[category._id]"
+                                            class="form-check-input"
+                                            type="checkbox"
+                                        />
+                                        <label class="form-check-label" :for="'check' + category._id">
+                                            {{ category.name }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- filtre note -->
                 </div>
             </div>
             <div class="card-body">
@@ -146,7 +197,10 @@ export default {
         return {
             statusNames: ['en brouillon', 'à faire', 'validé', 'annulé'],
             optionsStatus: [],
-            statusSelected: [],
+            statusSelected: {},
+            selectedCategories: {},
+            categorySearch: null,
+            checkAll: true,
             dates: null,
             columns: [
                 { data: 'date', name: 'date' },
@@ -167,11 +221,31 @@ export default {
     computed: {
         ...mapStores(useIdeaStore, useCategoryStore),
 
+        categories() {
+            const categories = [];
+
+            for (const key in this.categoryStore.categories) {
+                const category = this.categoryStore.categories[key];
+
+                if (this.categorySearch === null || this.categorySearch.length === 0) {
+                    categories.push(category);
+                } else {
+                    if (category.name.toLowerCase().indexOf(this.categorySearch.toLowerCase()) != -1) {
+                        categories.push(category);
+                    }
+                }
+            }
+
+            return categories;
+        },
+
         ideas() {
             const status = [];
-            this.statusSelected.forEach(selected => {
+            for (const key in this.statusSelected) {
+                const selected = this.statusSelected[key];
                 status.push(selected.code);
-            });
+            }
+
             const ideas = [];
 
             this.ideaStore.ideas.forEach((idea) => {
@@ -183,7 +257,15 @@ export default {
                     appendTo = dayjs(idea.date).isBetween(start, end);
                 }
 
-                appendTo = status.includes(parseInt(idea.status));
+                if (appendTo) {
+                    appendTo = status.includes(parseInt(idea.status));
+                }
+
+                if (appendTo && this.selectedCategories[idea.category] !== undefined) {
+                    appendTo = this.selectedCategories[idea.category] === true;
+                } else if (appendTo && idea.category === null) {
+                    appendTo = this.selectedCategories['0'] === true;
+                }
 
                 if (appendTo) {
                     if (this.categoryStore.categories[idea.category]) {
@@ -197,6 +279,14 @@ export default {
             });
 
             return ideas;
+        }
+    },
+
+    watch: {
+        checkAll() {
+            for (const key in this.selectedCategories) {
+                this.selectedCategories[key] = this.checkAll;
+            }
         }
     },
 
@@ -221,6 +311,13 @@ export default {
         if (!statusCategories) {
             createToastify('La récupération des catégories a échoué', 'error');
         }
+
+        this.selectedCategories['0'] = true;
+        for (const key in this.categoryStore.categories) {
+            this.selectedCategories[key] = true;
+        }
+
+        this.checkAll = true;
     },
 
     unmounted() {
@@ -268,5 +365,14 @@ export default {
 .card,
 .card-header {
     border-color: #dee2e6b0;
+}
+
+.btn-outline-success {
+    background-color: #fff;
+}
+
+.categoryContainer {
+    max-height: 150px;
+    overflow-y: scroll;
 }
 </style>
