@@ -15,19 +15,7 @@
         <div class="card">
             <div class="card-header">
                 <div class="row">
-                    <div class="col-md-4 d-flex align-items-center gap-2">
-                        <label for="daterange" class="fw-bold">Période</label>
-                        <VueDatePicker
-                            id="daterange"
-                            v-model="dates"
-                            locale="fr"
-                            :format="format"
-                            auto-apply
-                            :enable-time-picker="false"
-                            range
-                        ></VueDatePicker>
-                    </div>
-                    <div class="col-md-6 d-flex align-items-center gap-2">
+                    <div class="col-8 d-flex align-items-center gap-2">
                         <span class="fw-bold">Statut</span>
                         <VueMultiselect
                             v-model="statusSelected"
@@ -43,7 +31,46 @@
                             track-by="code"
                         />
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-4 text-end">
+                        <div class="btn btn-group pe-0">
+                            <button type="button" class="btn btn-outline-secondary" @click="reset">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary"
+                                @click="showAdvancedFilters = !showAdvancedFilters"
+                            >
+                                <i v-if="showAdvancedFilters === false" class="bi bi-eye-fill"></i>
+                                <i v-if="showAdvancedFilters === true" class="bi bi-eye-slash-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="showAdvancedFilters" class="row">
+                    <div class="col-12"><hr class="my-3" /></div>
+                    <div class="col-md-4 d-flex align-items-center gap-2">
+                        <label for="daterange" class="fw-bold">Période</label>
+                        <VueDatePicker
+                            id="daterange"
+                            v-model="dates"
+                            locale="fr"
+                            :format="format"
+                            auto-apply
+                            :enable-time-picker="false"
+                            range
+                        ></VueDatePicker>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-center gap-2">
+                        <label for="daterange" class="fw-bold">Note</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Min</span>
+                            <input v-model="minNote" min="0" max="5" type="number" class="form-control" />
+                            <span class="input-group-text">Max</span>
+                            <input v-model="maxNote" min="0" max="5" type="number" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="dropdown h-100">
                             <button
                                 class="btn btn-outline-success h-100 w-100 dropdown-toggle"
@@ -93,7 +120,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- filtre note -->
                 </div>
             </div>
             <div class="card-body">
@@ -196,11 +222,14 @@ export default {
     data() {
         return {
             statusNames: ['en brouillon', 'à faire', 'validé', 'annulé'],
+            showAdvancedFilters: false,
             optionsStatus: [],
             statusSelected: {},
             selectedCategories: {},
             categorySearch: null,
             checkAll: true,
+            minNote: 0,
+            maxNote: 5,
             dates: null,
             columns: [
                 { data: 'date', name: 'date' },
@@ -268,6 +297,10 @@ export default {
                 }
 
                 if (appendTo) {
+                    appendTo = idea.note >= this.minNote && idea.note <= this.maxNote;
+                }
+
+                if (appendTo) {
                     if (this.categoryStore.categories[idea.category]) {
                         idea.categoryName = this.categoryStore.categories[idea.category].name;
                     } else {
@@ -287,19 +320,27 @@ export default {
             for (const key in this.selectedCategories) {
                 this.selectedCategories[key] = this.checkAll;
             }
+        },
+
+        minNote() {
+            if (this.minNote > 5) {
+                this.minNote = 5;
+            } else if (this.minNote < 0) {
+                this.minNote = 0;
+            }
+        },
+
+        maxNote() {
+            if (this.maxNote > 5) {
+                this.maxNote = 5;
+            } else if (this.maxNote < 0) {
+                this.maxNote = 0;
+            }
         }
     },
 
     async mounted() {
-        this.optionsStatus = [];
-        this.statusSelected = [];
-        for (let i = 0; i < this.statusNames.length; i++) {
-            const option = { name: this.statusNames[i], code: i };
-            this.optionsStatus.push(option);
-            if (i < 3) {
-                this.statusSelected.push(option);
-            }
-        }
+        this.hydrateStatutSelected();
 
         this.ideaStore.setOnlySticky(false);
         const status = await this.ideaStore.getIdeas();
@@ -325,6 +366,31 @@ export default {
     },
 
     methods: {
+        hydrateStatutSelected() {
+            this.optionsStatus = [];
+            this.statusSelected = [];
+            for (let i = 0; i < this.statusNames.length; i++) {
+                const option = { name: this.statusNames[i], code: i };
+                this.optionsStatus.push(option);
+                if (i < 3) {
+                    this.statusSelected.push(option);
+                }
+            }
+        },
+
+        reset() {
+            this.minNote = 0;
+            this.maxNote = 5;
+            this.dates = null;
+            this.checkAll = true;
+            this.categorySearch = null;
+            for (const key in this.categoryStore.categories) {
+                this.selectedCategories[key] = true;
+            }
+
+            this.hydrateStatutSelected();
+        },
+
         show(id) {
             this.$router.push('/ideas/' + id);
         },
@@ -362,6 +428,12 @@ export default {
 <style>
 @import 'datatables.net-bs5';
 
+table.dataTable th.dt-type-numeric,
+table.dataTable th.dt-type-date,
+table.dataTable td.dt-type-numeric,
+table.dataTable td.dt-type-date {
+    text-align: left;
+}
 .card,
 .card-header {
     border-color: #dee2e6b0;
