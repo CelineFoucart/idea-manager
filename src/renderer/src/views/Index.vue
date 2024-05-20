@@ -2,7 +2,7 @@
     <article>
         <header class="mb-4">
             <h1 class="display-3 fw-normal mb-1">Liste des idées</h1>
-            <p class="fs-5 fw-normal text-muted">Retrouvez et fitrez les idées que vous avez ajouté à l'application.</p>
+            <p class="fs-5 fw-normal text-muted">Retrouvez et fitrez les idées que vous avez ajoutées à l'application.</p>
         </header>
 
         <aside class="mb-1 text-end">
@@ -33,10 +33,16 @@
                     </div>
                     <div class="col-4 text-end">
                         <div class="btn btn-group pe-0">
-                            <button type="button" class="btn btn-outline-secondary" @click="reset">
+                            <button
+                                v-tooltip="'Réinitialiser les filtres'"
+                                type="button"
+                                class="btn btn-outline-secondary"
+                                @click="reset"
+                            >
                                 <i class="bi bi-arrow-repeat"></i>
                             </button>
                             <button
+                                v-tooltip="'Filtres avancées'"
                                 type="button"
                                 class="btn btn-outline-secondary"
                                 @click="showAdvancedFilters = !showAdvancedFilters"
