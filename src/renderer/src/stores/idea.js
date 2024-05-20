@@ -3,11 +3,23 @@ import { defineStore } from 'pinia';
 export const useIdeaStore = defineStore('idea', {
     state: () => ({
         ideas: [],
-        idea: null
+        idea: null,
+        onlySticky: false
     }),
 
     actions: {
+        setOnlySticky(onlySticky = false) {
+            this.onlySticky = onlySticky;
+        },
+
+        reset() {
+            this.ideas = [];
+            this.onlySticky = false;
+            this.idea = null;
+        },
+
         async getIdeas(params = {}) {
+            this.ideas = [];
             try {
                 this.ideas = await window.api.ideaDB.findBy(params);
                 return true;
@@ -31,7 +43,9 @@ export const useIdeaStore = defineStore('idea', {
         async append(data) {
             try {
                 const newIdea = await window.api.ideaDB.append(data);
-                this.ideas.push(newIdea);
+                if (this.onlySticky === false || (this.onlySticky === true && newIdea.sticky === true)) {
+                    this.ideas.push(newIdea);
+                }
 
                 return true;
             } catch (error) {

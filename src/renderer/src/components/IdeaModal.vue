@@ -89,6 +89,10 @@
                             </label>
                             <input id="note" v-model="note" type="range" class="form-range" min="0" max="5" step="1" />
                         </div>
+                        <div class="form-check form-switch">
+                            <input id="sticky" v-model="sticky" class="form-check-input" type="checkbox" role="switch" />
+                            <label class="form-check-label" for="sticky"> Epingler sur le tableau de bord ?</label>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success btn-sm" @click.prevent="save">Sauvegarder</button>
@@ -114,7 +118,7 @@ export default {
     name: 'IdeaModal',
 
     components: {
-        VueDatePicker,
+        VueDatePicker
     },
 
     props: {
@@ -128,7 +132,8 @@ export default {
 
     data() {
         return {
-            date: null,
+            sticky: false,
+            date: new Date(),
             title: null,
             keywords: null,
             description: null,
@@ -155,6 +160,7 @@ export default {
 
     mounted() {
         if (this.idea !== null) {
+            this.sticky = this.idea.sticky;
             this.date = this.idea.date;
             this.title = this.idea.title;
             this.keywords = this.idea.keywords;
@@ -193,7 +199,7 @@ export default {
                 content: this.idea !== null ? this.idea.content : null,
                 note: this.note,
                 status: this.status,
-                sticky: this.idea !== null ? this.idea.sticky : false,
+                sticky: this.sticky,
                 todos: this.idea !== null ? Array.from(this.idea.todos) : []
             };
 

@@ -55,9 +55,7 @@
                         {{ formatDateTime(props.cellData) }}
                     </template>
                     <template #column-status="props">
-                        <span v-if="parseInt(props.cellData) >= 0 || parseInt(props.cellData) < 4">
-                            {{ statusNames[parseInt(props.cellData)] }}
-                        </span>
+                        <StatusIdea :status="props.cellData"></StatusIdea>
                     </template>
                     <template #column-note="props">
                         <span v-tooltip="props.cellData + '/ 5'">
@@ -110,6 +108,7 @@ import IdeaModal from '../components/IdeaModal.vue';
 import DeleteModal from '../components/DeleteModal.vue';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import StatusIdea from '../components/StatusIdea.vue';
 dayjs.extend(isBetween);
 
 DataTable.use(DataTablesCore);
@@ -121,7 +120,8 @@ export default {
         DataTable,
         IdeaModal,
         DeleteModal,
-        VueDatePicker
+        VueDatePicker,
+        StatusIdea
     },
 
     mixins: [datetimeMixin],
@@ -177,6 +177,7 @@ export default {
     },
 
     async mounted() {
+        this.ideaStore.setOnlySticky(false);
         const status = await this.ideaStore.getIdeas();
         if (!status) {
             createToastify('La récupération des données a échoué', 'error');
@@ -186,6 +187,10 @@ export default {
         if (!statusCategories) {
             createToastify('La récupération des catégories a échoué', 'error');
         }
+    },
+
+    unmounted() {
+        this.ideaStore.reset();
     },
 
     methods: {

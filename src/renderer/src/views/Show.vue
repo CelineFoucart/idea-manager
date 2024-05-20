@@ -22,13 +22,7 @@
                         <span v-if="categoryName" class="badge text-bg-light border">
                             <i class="bi bi-tag-fill"></i> {{ categoryName }}
                         </span>
-                        <span v-if="statusName !== null" class="badge ms-1" :class="statusColor">
-                            <i v-if="ideaStore.idea.status == 0" class="bi bi-pencil-square"></i>
-                            <i v-if="ideaStore.idea.status == 1" class="bi bi-check2-square"></i>
-                            <i v-if="ideaStore.idea.status == 2" class="bi bi-check-lg"></i>
-                            <i v-if="ideaStore.idea.status == 3" class="bi bi-x-lg"></i>
-                            {{ statusName }}
-                        </span>
+                        <StatusIdea :status="ideaStore.idea.status"></StatusIdea>
                     </div>
                     <div class="pt-1 text-muted small">
                         <i class="bi bi-calendar-fill"></i>
@@ -65,13 +59,15 @@ import { mapStores } from 'pinia';
 import { createToastify } from '../utils/toastify';
 import { datetimeMixin } from '../utils/datetimeMixin';
 import IdeaModal from '../components/IdeaModal.vue';
+import StatusIdea from '../components/StatusIdea.vue';
 import tinymce from 'tinymce';
 
 export default {
     name: 'Show',
 
     components: {
-        IdeaModal
+        IdeaModal,
+        StatusIdea
     },
 
     mixins: [datetimeMixin],
@@ -124,6 +120,11 @@ export default {
     },
 
     async mounted() {
+        const statusCategories = await this.categoryStore.getCategories();
+        if (!statusCategories) {
+            createToastify('La récupération des catégories a échoué', 'error');
+        }
+
         const ideaId = this.$route.params.id;
         const status = await this.ideaStore.findOne(ideaId);
         if (!status) {
@@ -195,8 +196,8 @@ export default {
 
     unmounted() {
         tinymce.activeEditor.destroy();
+        this.ideaStore.reset();
     },
-    
 
     methods: {
         async save() {
