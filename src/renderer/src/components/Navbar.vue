@@ -26,6 +26,12 @@
                         </router-link>
                     </li>
                     <li class="nav-item pe-2">
+                        <router-link v-tooltip="'Tâches'" :to="{ name: 'task_index' }" class="nav-link" active-class="active">
+                            <i class="bi bi-list-task"></i>
+                            <div class="visually-hidden">Tâches</div>
+                        </router-link>
+                    </li>
+                    <li class="nav-item pe-2">
                         <router-link
                             v-tooltip="'Gérer les catégories'"
                             :to="{ name: 'category_index' }"

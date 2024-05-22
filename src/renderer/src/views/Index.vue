@@ -12,7 +12,7 @@
             </button>
         </aside>
 
-        <div class="card">
+        <div class="card shadow-sm">
             <div class="card-header">
                 <div class="row">
                     <div class="col-8 d-flex align-items-center gap-2">
@@ -439,10 +439,6 @@ table.dataTable th.dt-type-date,
 table.dataTable td.dt-type-numeric,
 table.dataTable td.dt-type-date {
     text-align: left;
-}
-.card,
-.card-header {
-    border-color: #dee2e6b0;
 }
 
 .btn-outline-success {
