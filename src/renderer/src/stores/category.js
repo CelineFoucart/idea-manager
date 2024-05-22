@@ -24,7 +24,7 @@ export const useCategoryStore = defineStore('category', {
         async append(data) {
             try {
                 const newCategory = await window.api.categoryDB.append(data);
-                this.categories.push(newCategory);
+                this.categories[newCategory._id] = newCategory;
 
                 return true;
             } catch (error) {
@@ -39,9 +39,8 @@ export const useCategoryStore = defineStore('category', {
                     return false;
                 }
 
-                const index = this.categories.findIndex((element) => element._id === categoryId);
-                if (index !== -1) {
-                    this.categories.splice(index, 1);
+                if (this.categories[categoryId]) {
+                    delete this.categories[categoryId];
                 }
 
                 return true;
@@ -57,10 +56,9 @@ export const useCategoryStore = defineStore('category', {
                     return false;
                 }
 
-                const index = this.categories.findIndex((element) => element._id === categoryId);
-                if (index !== -1) {
+                if (this.categories[categoryId]) {
                     data._id = categoryId;
-                    this.categories[index] = data;
+                    this.categories[categoryId] = data;
                 }
 
                 return true;

@@ -172,7 +172,7 @@
                             </button>
                             <button v-tooltip="'Supprimer'" class="btn btn-sm btn-danger" @click="onShowDelete(props.rowData)">
                                 <i class="bi bi-trash3-fill"></i>
-                                <span class="visually-hidden">Voir</span>
+                                <span class="visually-hidden">Supprimer</span>
                             </button>
                         </div>
                     </template>

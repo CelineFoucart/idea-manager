@@ -1,3 +1,4 @@
+import CategoriesIndex from './views/CategoriesIndex.vue';
 import Dashboard from './views/Dashboard.vue';
 import Index from './views/Index.vue';
 import Show from './views/Show.vue';
@@ -6,6 +7,11 @@ import { createRouter, createWebHistory } from 'vue-router';
 export default new createRouter({
     history: createWebHistory(0),
     routes: [
+        {
+            path: `/`,
+            name: 'dashboard',
+            component: Dashboard
+        },
         {
             path: `/ideas`,
             name: 'idea_index',
@@ -17,9 +23,9 @@ export default new createRouter({
             component: Show
         },
         {
-            path: `/`,
-            name: 'dashboard',
-            component: Dashboard
+            path: `/categories`,
+            name: 'category_index',
+            component: CategoriesIndex
         }
     ]
 });
