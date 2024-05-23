@@ -2,6 +2,7 @@ import Datastore from '@seald-io/nedb';
 
 const ideaDB = new Datastore({ filename: 'data/ideas.db', autoload: true });
 const categoryDB = new Datastore({ filename: 'data/categories.db', autoload: true });
+const todoDB = new Datastore({ filename: 'data/todos.db', autoload: true });
 
 /**
  * Custom APIs for renderer
@@ -60,6 +61,30 @@ export const api = {
 
             await categoryDB.removeAsync({ _id: categoryId }, {});
             categoryDB.loadDatabase();
+
+            return true;
+        }
+    },
+
+    todoDB: {
+        findBy: async (params = {}) => {
+            return await todoDB.findAsync(params).sort({ name: 1 });
+        },
+
+        append: async (data) => {
+            return await todoDB.insertAsync(data);
+        },
+
+        update: async (data, id) => {
+            await todoDB.updateAsync({ _id: id }, { $set: data }, { upsert: true });
+            todoDB.loadDatabase();
+
+            return true;
+        },
+
+        remove: async (id) => {
+            await todoDB.removeAsync({ _id: id }, {});
+            todoDB.loadDatabase();
 
             return true;
         }
