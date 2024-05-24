@@ -4,28 +4,47 @@
             <h1 class="display-3 fw-normal mb-1">Liste des tâches</h1>
         </header>
 
-        <div class="card shadow-sm">
-            <div class="card-header py-3">
-                <div class="add-items d-flex gap-2">
-                    <input v-model="newTodo" type="text" class="form-control input-sm" placeholder="Une tâche à ajouter ?" />
-                    <button class="btn btn-success font-weight-bold btn-sm" @click="onAppend">Ajouter</button>
+        <div class="card shadow-sm mt-4">
+            <div class="card-header py-0">
+                <div class="row align-items-end">
+                    <div class="col-6 col-md-8 col-lg-9">
+                        <div class="input-group py-2">
+                            <input v-model="newTodo" type="text" class="form-control input-sm" placeholder="Nouvelle tâche" />
+                            <button class="btn btn-success font-weight-bold btn-sm" @click="onAppend">Ajouter</button>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-3 py-2 border-start">
+                        <h2 class="h6 d-flex justify-content-between">
+                            <span>Avancement ({{ progressPercentFormated }})</span> <span>{{ stats.done }}/{{ stats.all }}</span>
+                        </h2>
+                        <div
+                            class="progress"
+                            role="progressbar"
+                            aria-label="Progression"
+                            :aria-valuenow="stats.percent"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                        >
+                            <div class="progress-bar" :style="{ width: stats.percent + '%' }"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="card-body">
                 <ul class="nav nav-pills mt-2">
                     <li role="presentation" class="nav-item">
                         <a href="#" class="nav-link" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'">
-                            Toutes
+                            Toutes ({{ stats.all }})
                         </a>
                     </li>
                     <li role="presentation" class="nav-item ps-0">
                         <a href="#" class="nav-link" :class="{ active: activeTab === 'notDone' }" @click="activeTab = 'notDone'">
-                            A faire
+                            A faire ({{ stats.notDone }})
                         </a>
                     </li>
                     <li role="presentation" class="nav-item">
                         <a href="#" class="nav-link" :class="{ active: activeTab === 'done' }" @click="activeTab = 'done'">
-                            Complétées
+                            Complétées ({{ stats.done }})
                         </a>
                     </li>
                 </ul>
@@ -75,6 +94,28 @@ export default {
             });
 
             return todos;
+        },
+
+        stats() {
+            const stats = { all: this.todoStore.todos.length, notDone: 0, done: 0, percent: 0 };
+
+            this.todoStore.todos.forEach((todo) => {
+                if (todo.isDone) {
+                    stats.done++;
+                } else {
+                    stats.notDone++;
+                }
+            });
+
+            stats.percent = (stats.done * 100) / stats.all;
+
+            return stats;
+        },
+
+        progressPercentFormated() {
+            const number = `${this.stats.percent}`;
+
+            return number.replace('.', ',') + '%';
         }
     },
 

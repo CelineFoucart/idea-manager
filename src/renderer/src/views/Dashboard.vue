@@ -5,7 +5,7 @@
         </header>
         <div class="row g-2">
             <div v-for="idea in ideaStore.ideas" :key="idea._id" class="col-md-6 col-lg-4">
-                <section class="bg-light rounded h-100 bg-white shadow-sm p-3 position-relative">
+                <section class="rounded h-100 bg-white shadow-sm p-3 position-relative">
                     <div class="d-flex justify-content-between align-items-center">
                         <StatusIdea :status="idea.status"></StatusIdea>
                         <div class="text-muted small">
