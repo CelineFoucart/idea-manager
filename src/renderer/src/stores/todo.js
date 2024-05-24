@@ -7,6 +7,7 @@ export const useTodoStore = defineStore('todo', {
 
     actions: {
         async getAll() {
+            this.todos = [];
             try {
                 this.todos = await window.api.todoDB.findBy({});
 
@@ -44,10 +45,10 @@ export const useTodoStore = defineStore('todo', {
         async update(data, todoId) {
             try {
                 await window.api.todoDB.update(data, todoId);
-                const index = this.todos.indexOf((element) => element._id === todoId);
+                const index = this.todos.findIndex((element) => element._id === todoId);
                 if (index !== -1) {
                     data._id = todoId;
-                    this.todos[todoId] = data;
+                    this.todos[index] = data;
                 }
 
                 return true;

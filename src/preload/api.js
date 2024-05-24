@@ -68,7 +68,7 @@ export const api = {
 
     todoDB: {
         findBy: async (params = {}) => {
-            return await todoDB.findAsync(params).sort({ name: 1 });
+            return await todoDB.findAsync(params).sort({ title: 1 });
         },
 
         append: async (data) => {

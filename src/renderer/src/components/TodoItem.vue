@@ -3,12 +3,12 @@
         <div class="row align-items-center">
             <div class="col-8">
                 <header class="form-check">
-                    <input v-model="isDone" class="form-check-input" type="checkbox" />
+                    <input :checked="isDone" class="form-check-input" type="checkbox" @click="editIsDone" />
                     <h2 class="h6 form-check-label">
                         <span class="me-2" :class="{ 'todo-complete': isDone }">{{ todo.title }}</span>
-                        <span v-if="todo.priority === 1" class="badge text-bg-success">Priorité basse</span>
-                        <span v-if="todo.priority === 2" class="badge text-bg-warning">Priorité moyenne</span>
-                        <span v-if="todo.priority === 3" class="badge text-bg-danger">Priorité haute</span>
+                        <span v-if="todo.priority == 1" class="badge text-bg-success">Priorité basse</span>
+                        <span v-if="todo.priority == 2" class="badge text-bg-warning">Priorité moyenne</span>
+                        <span v-if="todo.priority == 3" class="badge text-bg-danger">Priorité haute</span>
                     </h2>
                 </header>
                 <div v-if="todo.content !== null" class="small" :class="{ 'todo-complete': isDone }">{{ todo.content }}</div>
@@ -34,6 +34,8 @@
             @on-close="openDeleteModal = false"
             @on-confirm="performDelete"
         ></DeleteModal>
+
+        <EditTodo v-if="openEditModal" :data="todo" @on-close="openEditModal = false" @on-edit="performEdit"></EditTodo>
     </section>
 </template>
 
@@ -42,12 +44,14 @@ import DeleteModal from '@renderer/components/DeleteModal.vue';
 import { useTodoStore } from '@renderer/stores/todo.js';
 import { mapStores } from 'pinia';
 import { createToastify } from '@renderer/utils/toastify.js';
+import EditTodo from './EditTodo.vue';
 
 export default {
     name: 'TodoItem',
 
     components: {
-        DeleteModal
+        DeleteModal,
+        EditTodo
     },
 
     props: {
@@ -81,6 +85,29 @@ export default {
             }
 
             this.openDeleteModal = false;
+        },
+
+        async editIsDone() {
+            this.isDone = !this.isDone;
+
+            const data = {
+                title: this.todo.title,
+                content: this.todo.content,
+                isDone: this.isDone,
+                priority: this.todo.priority
+            };
+
+            await this.performEdit(data);
+        },
+
+        async performEdit(data) {
+            const status = await this.todoStore.update(data, this.todo._id);
+            if (status === false) {
+                createToastify("L'opération a échoué", 'error');
+            } else {
+                createToastify("L'élément a été modifié", 'success');
+                this.openEditModal = false;
+            }
         }
     }
 };

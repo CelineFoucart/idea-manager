@@ -54,8 +54,8 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <div class="mb-3">
-                                        <label for="categories" class="form-label">Statut</label>
-                                        <select id="categories" v-model="status" class="form-select">
+                                        <label for="status" class="form-label">Statut</label>
+                                        <select id="status" v-model="status" class="form-select">
                                             <option value="0">En brouillon</option>
                                             <option value="1">A faire</option>
                                             <option value="2">Validé</option>
