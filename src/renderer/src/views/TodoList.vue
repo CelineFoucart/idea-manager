@@ -31,23 +31,82 @@
                 </div>
             </div>
             <div class="card-body">
-                <ul class="nav nav-pills mt-2">
-                    <li role="presentation" class="nav-item">
-                        <a href="#" class="nav-link" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'">
-                            Toutes ({{ stats.all }})
-                        </a>
-                    </li>
-                    <li role="presentation" class="nav-item ps-0">
-                        <a href="#" class="nav-link" :class="{ active: activeTab === 'notDone' }" @click="activeTab = 'notDone'">
-                            A faire ({{ stats.notDone }})
-                        </a>
-                    </li>
-                    <li role="presentation" class="nav-item">
-                        <a href="#" class="nav-link" :class="{ active: activeTab === 'done' }" @click="activeTab = 'done'">
-                            Complétées ({{ stats.done }})
-                        </a>
-                    </li>
-                </ul>
+                <div class="row">
+                    <div class="col-6">
+                        <ul class="nav nav-pills mt-2">
+                            <li role="presentation" class="nav-item">
+                                <a href="#" class="nav-link" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'">
+                                    Toutes ({{ stats.all }})
+                                </a>
+                            </li>
+                            <li role="presentation" class="nav-item ps-0">
+                                <a
+                                    href="#"
+                                    class="nav-link"
+                                    :class="{ active: activeTab === 'notDone' }"
+                                    @click="activeTab = 'notDone'"
+                                >
+                                    A faire ({{ stats.notDone }})
+                                </a>
+                            </li>
+                            <li role="presentation" class="nav-item">
+                                <a
+                                    href="#"
+                                    class="nav-link"
+                                    :class="{ active: activeTab === 'done' }"
+                                    @click="activeTab = 'done'"
+                                >
+                                    Complétées ({{ stats.done }})
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-6 text-end">
+                        <div class="dropdown">
+                            <button
+                                class="btn btn-secondary dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                Priorités
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><h6 class="dropdown-header">Afficher</h6></li>
+                                <li>
+                                    <span class="dropdown-item">
+                                        <div class="form-check">
+                                            <input id="one" v-model="priorityOne" class="form-check-input" type="checkbox" />
+                                            <label class="form-check-label badge text-bg-success" for="one">
+                                                Priorité basse
+                                            </label>
+                                        </div>
+                                    </span>
+                                </li>
+                                <li>
+                                    <span class="dropdown-item">
+                                        <div class="form-check">
+                                            <input id="two" v-model="priorityTwo" class="form-check-input" type="checkbox" />
+                                            <label class="form-check-label badge text-bg-warning" for="two">
+                                                Priorité moyenne
+                                            </label>
+                                        </div>
+                                    </span>
+                                </li>
+                                <li>
+                                    <span class="dropdown-item">
+                                        <div class="form-check">
+                                            <input id="three" v-model="priorityThree" class="form-check-input" type="checkbox" />
+                                            <label class="form-check-label badge text-bg-danger" for="three">
+                                                Priorité haute
+                                            </label>
+                                        </div>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="my-2">
                     <TodoItem v-for="todo in todos" :key="todo._id" :todo="todo"></TodoItem>
@@ -73,7 +132,10 @@ export default {
     data() {
         return {
             activeTab: 'all',
-            newTodo: null
+            newTodo: null,
+            priorityOne: true,
+            priorityTwo: true,
+            priorityThree: true
         };
     },
 
@@ -83,7 +145,19 @@ export default {
         todos() {
             const todos = [];
 
-            this.todoStore.todos.forEach((todo) => {
+            for (let i = 0; i < this.todoStore.todos.length; i++) {
+                const todo = this.todoStore.todos[i];
+
+                if (this.priorityOne === false && todo.priority == 1) {
+                    continue;
+                }
+                if (this.priorityTwo === false && todo.priority == 2) {
+                    continue;
+                }
+                if (this.priorityThree === false && todo.priority == 3) {
+                    continue;
+                }
+
                 if (this.activeTab === 'all') {
                     todos.push(todo);
                 } else if (this.activeTab === 'notDone' && todo.isDone === false) {
@@ -91,7 +165,7 @@ export default {
                 } else if (this.activeTab === 'done' && todo.isDone === true) {
                     todos.push(todo);
                 }
-            });
+            }
 
             return todos;
         },
