@@ -199,8 +199,7 @@ export default {
                 content: this.idea !== null ? this.idea.content : null,
                 note: this.note,
                 status: this.status,
-                sticky: this.sticky,
-                todos: this.idea !== null ? Array.from(this.idea.todos) : []
+                sticky: this.sticky
             };
 
             if (this.idea !== null) {
