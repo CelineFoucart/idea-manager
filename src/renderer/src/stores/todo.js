@@ -55,6 +55,16 @@ export const useTodoStore = defineStore('todo', {
             } catch (error) {
                 return false;
             }
+        },
+
+        async removeTagReference(tagId) {
+            try {
+                await window.api.todoDB.setTagToNull(tagId);
+                await this.getAll();
+                return true;
+            } catch (error) {
+                return false;
+            }
         }
     }
 });

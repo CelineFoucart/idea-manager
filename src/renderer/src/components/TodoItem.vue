@@ -9,6 +9,9 @@
                         <span v-if="todo.priority == 1" class="badge text-bg-success">Priorité basse</span>
                         <span v-if="todo.priority == 2" class="badge text-bg-warning">Priorité moyenne</span>
                         <span v-if="todo.priority == 3" class="badge text-bg-danger">Priorité haute</span>
+                        <span v-if="todo.tag !== null && tagStore.tags[todo.tag]" class="badge text-bg-secondary ms-1">
+                            {{ tagStore.tags[todo.tag].name }}
+                        </span>
                     </h2>
                 </header>
                 <div v-if="todo.content !== null" class="small" :class="{ 'todo-complete': isDone }">{{ todo.content }}</div>
@@ -42,6 +45,7 @@
 <script>
 import DeleteModal from '@renderer/components/DeleteModal.vue';
 import { useTodoStore } from '@renderer/stores/todo.js';
+import { useTagStore } from '@renderer/stores/tag.js';
 import { mapStores } from 'pinia';
 import { createToastify } from '@renderer/utils/toastify.js';
 import EditTodo from './EditTodo.vue';
@@ -68,7 +72,7 @@ export default {
     },
 
     computed: {
-        ...mapStores(useTodoStore)
+        ...mapStores(useTodoStore, useTagStore)
     },
 
     mounted() {

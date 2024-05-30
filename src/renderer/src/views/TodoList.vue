@@ -1,8 +1,19 @@
 <template>
     <article>
         <header class="mb-5">
-            <h1 class="display-3 fw-normal mb-1">Liste des tâches</h1>
+            <div class="row align-items-center">
+                <div class="col-7">
+                    <h1 class="display-3 fw-normal mb-1">Liste des tâches</h1>
+                </div>
+                <div class="col-5 text-end">
+                    <button type="button" class="btn btn-dark" @click="openTagModal = true">
+                        <i class="bi bi-tag-fill"></i>
+                        Etiquettes
+                    </button>
+                </div>
+            </div>
         </header>
+        <TagModal v-if="openTagModal" @on-close="openTagModal = false"></TagModal>
 
         <div class="card shadow-sm mt-4">
             <div class="card-header py-0">
@@ -118,7 +129,9 @@
 
 <script>
 import TodoItem from '@renderer/components/TodoItem.vue';
+import TagModal from '@renderer/components/TagModal.vue';
 import { useTodoStore } from '@renderer/stores/todo.js';
+import { useTagStore } from '@renderer/stores/tag.js';
 import { mapStores } from 'pinia';
 import { createToastify } from '@renderer/utils/toastify.js';
 
@@ -126,7 +139,8 @@ export default {
     name: 'TodoList',
 
     components: {
-        TodoItem
+        TodoItem,
+        TagModal
     },
 
     data() {
@@ -135,12 +149,13 @@ export default {
             newTodo: null,
             priorityOne: true,
             priorityTwo: true,
-            priorityThree: true
+            priorityThree: true,
+            openTagModal: false
         };
     },
 
     computed: {
-        ...mapStores(useTodoStore),
+        ...mapStores(useTodoStore, useTagStore),
 
         todos() {
             const todos = [];
@@ -187,7 +202,7 @@ export default {
         },
 
         progressPercentFormated() {
-            const number = `${this.stats.percent}`;
+            const number = this.stats.percent.toFixed(2);
 
             return number.replace('.', ',') + '%';
         }
@@ -198,6 +213,11 @@ export default {
 
         if (status === false) {
             createToastify('Le chargement des tâches a échoué.', 'error');
+        }
+
+        const statusTag = await this.tagStore.getAll();
+        if (statusTag === false) {
+            createToastify('Le chargement des étiquettes a échoué.', 'error');
         }
     },
 

@@ -14,12 +14,37 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="priority" class="form-label">Priorité</label>
-                        <select id="priority" v-model="priority" class="form-select">
-                            <option value="1">Priorité basse</option>
-                            <option value="2">Priorité moyenne</option>
-                            <option value="3">Priorité haute</option>
-                        </select>
+                        <label for="priority" class="form-label required">Priorité</label>
+                        <VueMultiselect
+                            v-model="priority"
+                            :options="priorities"
+                            :allow-empty="false"
+                            :multiple="false"
+                            :close-on-select="true"
+                            placeholder="Choisir une priorité"
+                            select-label="Appuyer sur entrée pour choisir"
+                            selected-label="Sélectionné"
+                            deselect-label="Appuyer sur entrée pour enlever"
+                            label="label"
+                            track-by="value"
+                        />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tag">Etiquette</label>
+                        <VueMultiselect
+                            v-model="tag"
+                            :options="tags"
+                            :allow-empty="true"
+                            :multiple="false"
+                            :close-on-select="true"
+                            placeholder="Choisir une étiquette"
+                            select-label="Appuyer sur entrée pour choisir"
+                            selected-label="Sélectionné"
+                            deselect-label="Appuyer sur entrée pour enlever"
+                            label="name"
+                            track-by="_id"
+                        />
                     </div>
 
                     <div class="mb-3">
@@ -44,10 +69,17 @@
 </template>
 
 <script>
+import { useTagStore } from '@renderer/stores/tag.js';
 import { createToastify } from '@renderer/utils/toastify.js';
+import { mapStores } from 'pinia';
+import VueMultiselect from 'vue-multiselect';
 
 export default {
     title: 'EditTodo',
+
+    components: {
+        VueMultiselect
+    },
 
     props: {
         data: Object
@@ -60,15 +92,33 @@ export default {
             title: null,
             content: null,
             isDone: false,
-            priority: 1
+            tag: null,
+            priority: { value: '1', label: 'Priorité basse' }
         };
+    },
+
+    computed: {
+        ...mapStores(useTagStore),
+
+        priorities() {
+            return [
+                { value: '1', label: 'Priorité basse' },
+                { value: '2', label: 'Priorité moyenne' },
+                { value: '3', label: 'Priorité haute' }
+            ];
+        },
+
+        tags() {
+            return Object.values(this.tagStore.tags);
+        }
     },
 
     mounted() {
         this.title = this.data.title;
         this.content = this.data.content;
         this.isDone = this.data.isDone;
-        this.priority = this.data.priority;
+        this.priority = this.data.priority ? this.priorities[parseInt(this.data.priority) - 1] : null;
+        this.tag = this.data.tag ? this.tagStore.tags[this.data.tag] : null;
     },
 
     methods: {
@@ -85,7 +135,8 @@ export default {
                 title: this.title,
                 content: this.content,
                 isDone: this.isDone,
-                priority: this.priority
+                priority: this.priority ? this.priority.value : '1',
+                tag: this.tag !== null ? this.tag._id : null
             };
 
             this.$emit('on-edit', data);

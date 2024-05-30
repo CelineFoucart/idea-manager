@@ -3,6 +3,7 @@ import Datastore from '@seald-io/nedb';
 const ideaDB = new Datastore({ filename: 'data/ideas.db', autoload: true });
 const categoryDB = new Datastore({ filename: 'data/categories.db', autoload: true });
 const todoDB = new Datastore({ filename: 'data/todos.db', autoload: true });
+const tagDB = new Datastore({ filename: 'data/tags.db', autoload: true });
 
 /**
  * Custom APIs for renderer
@@ -82,9 +83,40 @@ export const api = {
             return true;
         },
 
+        setTagToNull: async (tagId) => {
+            await todoDB.updateAsync({ tag: tagId }, { $set: { tag: null } });
+            todoDB.loadDatabase();
+
+            return true;
+        },
+
         remove: async (id) => {
             await todoDB.removeAsync({ _id: id }, {});
             todoDB.loadDatabase();
+
+            return true;
+        }
+    },
+
+    tagDB: {
+        findBy: async (params = {}) => {
+            return await tagDB.findAsync(params).sort({ title: 1 });
+        },
+
+        append: async (data) => {
+            return await tagDB.insertAsync(data);
+        },
+
+        update: async (data, id) => {
+            await tagDB.updateAsync({ _id: id }, { $set: data }, { upsert: true });
+            tagDB.loadDatabase();
+
+            return true;
+        },
+
+        remove: async (id) => {
+            await tagDB.removeAsync({ _id: id }, {});
+            tagDB.loadDatabase();
 
             return true;
         }
