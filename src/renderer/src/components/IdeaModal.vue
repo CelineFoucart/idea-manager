@@ -40,28 +40,42 @@
                                 </div>
                                 <div v-if="v$.date.$errors.length" class="text-danger small">Ce champ est obligatoire.</div>
                             </div>
-
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="categories" class="form-label">Catégorie</label>
-                                    <select id="categories" v-model="category" class="form-select">
-                                        <option v-for="item in categoryStore.categories" :key="item._id" :value="item._id">
-                                            {{ item.name }}
-                                        </option>
-                                    </select>
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label required">Statut</label>
+                                        <VueMultiselect
+                                            v-model="status"
+                                            :options="statusOptions"
+                                            :allow-empty="false"
+                                            :multiple="false"
+                                            :close-on-select="true"
+                                            placeholder="Choisir un statut"
+                                            select-label="Appuyer sur entrée pour choisir"
+                                            selected-label="Sélectionné"
+                                            deselect-label="Appuyer sur entrée pour enlever"
+                                            label="label"
+                                            track-by="value"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <div class="mb-3">
-                                        <label for="status" class="form-label">Statut</label>
-                                        <select id="status" v-model="status" class="form-select">
-                                            <option value="0">En brouillon</option>
-                                            <option value="1">A faire</option>
-                                            <option value="2">Validé</option>
-                                            <option value="3">Annulé</option>
-                                        </select>
-                                    </div>
+                                    <label for="categories" class="form-label">Catégorie</label>
+                                    <VueMultiselect
+                                        v-model="category"
+                                        :options="options"
+                                        :allow-empty="true"
+                                        :multiple="false"
+                                        :close-on-select="true"
+                                        placeholder="Choisir une catégorie"
+                                        select-label="Appuyer sur entrée pour choisir"
+                                        selected-label="Sélectionné"
+                                        deselect-label="Appuyer sur entrée pour enlever"
+                                        label="name"
+                                        track-by="_id"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -105,6 +119,7 @@
 
 <script>
 import VueDatePicker from '@vuepic/vue-datepicker';
+import VueMultiselect from 'vue-multiselect';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { mapStores } from 'pinia';
 import { useCategoryStore } from '../stores/category';
@@ -118,13 +133,15 @@ export default {
     name: 'IdeaModal',
 
     components: {
-        VueDatePicker
+        VueDatePicker,
+        VueMultiselect
     },
 
     props: {
         idea: {
             type: Object,
-            default: null
+            default: null,
+            categoryOptions: []
         }
     },
 
@@ -139,13 +156,26 @@ export default {
             description: null,
             category: null,
             note: '0',
-            status: '0',
+            status: { value: '0', label: 'En brouillon' },
             v$: useVuelidate()
         };
     },
 
     computed: {
-        ...mapStores(useCategoryStore, useIdeaStore)
+        ...mapStores(useCategoryStore, useIdeaStore),
+
+        options() {
+            return Object.values(this.categoryStore.categories);
+        },
+
+        statusOptions() {
+            return [
+                { value: '0', label: 'En brouillon' },
+                { value: '1', label: 'A faire' },
+                { value: '2', label: 'Validé' },
+                { value: '3', label: 'Annulé' }
+            ];
+        }
     },
 
     validations() {
@@ -153,7 +183,7 @@ export default {
             title: { required, maxLength: maxLength(255), minLength: minLength(2) },
             description: { maxLength: maxLength(1500), minLength: minLength(3) },
             note: { required, minValue: minValue(0), maxValue: maxValue(5) },
-            status: { required, minValue: minValue(0), maxValue: maxValue(3) },
+            status: { required },
             date: { required }
         };
     },
@@ -165,9 +195,11 @@ export default {
             this.title = this.idea.title;
             this.keywords = this.idea.keywords;
             this.description = this.idea.description;
-            this.category = this.idea.category;
+            this.category = this.categoryStore.categories[this.idea.category];
             this.note = this.idea.note;
-            this.status = this.idea.status;
+            this.status = this.statusOptions[parseInt(this.idea.status)];
+        } else {
+            this.status = this.statusOptions[0];
         }
     },
 
@@ -194,11 +226,11 @@ export default {
                 date: dayjs(this.date).format('YYYY-MM-DD HH:mm:ss'),
                 title: this.title,
                 keywords: this.keywords,
-                category: this.category,
+                category: this.category ? this.category._id : null,
                 description: this.description,
                 content: this.idea !== null ? this.idea.content : null,
                 note: this.note,
-                status: this.status,
+                status: this.status ? this.status.value : '0',
                 sticky: this.sticky
             };
 

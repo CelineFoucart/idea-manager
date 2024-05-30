@@ -2,3 +2,14 @@
 .card-header {
     border-color: #dee2e6b0;
 }
+
+.required::after {
+    content: '*';
+    display: inline-block;
+    padding-left: 2px;
+}
+
+.multiselect__placeholder {
+    margin-bottom: 5px !important;
+    padding-top: 0;
+}
