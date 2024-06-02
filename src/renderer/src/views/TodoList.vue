@@ -72,7 +72,58 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="col-6 text-end">
+                    <div class="col-6 align-items-center justify-content-end gap-1 d-flex">
+                        <strong>Filtres :</strong>
+                        <div class="dropdown">
+                            <button
+                                class="btn btn-secondary dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                Etiquettes
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li class="border-bottom">
+                                    <span class="dropdown-item">
+                                        <div class="mb-3">
+                                            <label for="searchTag" class="fw-bold">Filtrer</label>
+                                            <input id="searchTag" v-model="queryTag" type="text" class="form-control" />
+                                        </div>
+                                    </span>
+                                </li>
+                                <li id="tag-container" class="bg-light">
+                                    <span class="dropdown-item">
+                                        <div v-for="tag in tags" :key="tag._id" class="form-check">
+                                            <input
+                                                :id="tag._id"
+                                                v-model="selectedTags[tag._id]"
+                                                class="form-check-input"
+                                                type="checkbox"
+                                            />
+                                            <label class="form-check-label" for="checkAll">{{ tag.name }}</label>
+                                        </div>
+                                    </span>
+                                </li>
+                                <li class="border-top">
+                                    <span class="dropdown-item">
+                                        <div class="form-check">
+                                            <input id="noTag" v-model="noTag" class="form-check-input" type="checkbox" />
+                                            <label class="form-check-label fw-bold" for="checkAll">Sans étiquette</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input
+                                                id="checkAll"
+                                                v-model="checkAllTags"
+                                                class="form-check-input"
+                                                type="checkbox"
+                                            />
+                                            <label class="form-check-label fw-bold" for="checkAll">Tout cocher</label>
+                                        </div>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
                         <div class="dropdown">
                             <button
                                 class="btn btn-secondary dropdown-toggle"
@@ -150,7 +201,11 @@ export default {
             priorityOne: true,
             priorityTwo: true,
             priorityThree: true,
-            openTagModal: false
+            openTagModal: false,
+            checkAllTags: true,
+            queryTag: null,
+            selectedTags: {},
+            noTag: true
         };
     },
 
@@ -170,6 +225,12 @@ export default {
                     continue;
                 }
                 if (this.priorityThree === false && todo.priority == 3) {
+                    continue;
+                }
+                if (todo.tag !== null && this.selectedTags[todo.tag] !== true) {
+                    continue;
+                }
+                if (todo.tag === null && this.noTag === false) {
                     continue;
                 }
 
@@ -201,10 +262,35 @@ export default {
             return stats;
         },
 
+        tags() {
+            const tags = [];
+
+            for (const key in this.tagStore.tags) {
+                const tag = this.tagStore.tags[key];
+                if (this.queryTag === null || this.queryTag.length < 1) {
+                    tags.push(tag);
+                } else {
+                    if (tag.name.toLowerCase().indexOf(this.queryTag.toLowerCase()) != -1) {
+                        tags.push(tag);
+                    }
+                }
+            }
+
+            return tags;
+        },
+
         progressPercentFormated() {
             const number = this.stats.percent.toFixed(2);
 
             return number.replace('.', ',') + '%';
+        }
+    },
+
+    watch: {
+        checkAllTags() {
+            for (const key in this.selectedTags) {
+                this.selectedTags[key] = this.checkAllTags;
+            }
         }
     },
 
@@ -219,6 +305,14 @@ export default {
         if (statusTag === false) {
             createToastify('Le chargement des étiquettes a échoué.', 'error');
         }
+
+        this.selectedTags = {};
+        for (const key in this.tagStore.tags) {
+            const tag = this.tagStore.tags[key];
+            this.selectedTags[tag._id] = true;
+        }
+
+        console.log(this.selectedTags);
     },
 
     methods: {
@@ -246,3 +340,10 @@ export default {
     }
 };
 </script>
+
+<style>
+#tag-container {
+    max-width: 300px;
+    overflow-y: scroll;
+}
+</style>
