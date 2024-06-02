@@ -8,7 +8,7 @@
             <div class="col-lg-6">
                 <section class="card shadow-sm">
                     <div class="card-header">
-                        <h2 class="fs-5 card-title">Idées par années</h2>
+                        <h2 class="fs-5 card-title">Idées par année</h2>
                     </div>
                     <div class="card-body">
                         <Bar :data="barYearData" :options="options" :style="stylesGraph"></Bar>

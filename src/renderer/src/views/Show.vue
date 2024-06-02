@@ -46,13 +46,13 @@
 
         <div class="bg-white rounded p-2 mt-3 shadow-sm">
             <label for="contentTextarea" class="label-form mb-1 fw-bold">Contenu</label>
-            <textarea id="contentTextarea" v-model="content"></textarea>
+            <jodit-editor v-model="content" :buttons="buttons" :config="config" />
             <button type="button" class="btn btn-sm btn-success mt-2" @click="save">Sauvegarder</button>
         </div>
     </article>
 </template>
 
-<script>
+<script lang="js">
 import { useIdeaStore } from '../stores/idea';
 import { useCategoryStore } from '../stores/category';
 import { mapStores } from 'pinia';
@@ -60,14 +60,16 @@ import { createToastify } from '../utils/toastify';
 import { datetimeMixin } from '../utils/datetimeMixin';
 import IdeaModal from '../components/IdeaModal.vue';
 import StatusIdea from '../components/StatusIdea.vue';
-import tinymce from 'tinymce';
+import 'jodit/build/jodit.min.css';
+import { JoditEditor } from 'jodit-vue';
 
 export default {
     name: 'Show',
 
     components: {
         IdeaModal,
-        StatusIdea
+        StatusIdea,
+        JoditEditor
     },
 
     mixins: [datetimeMixin],
@@ -75,7 +77,53 @@ export default {
     data() {
         return {
             editModal: false,
-            content: null
+            content: '',
+            config: {
+                language: 'fr'
+            },
+            buttons: [
+                'undo',
+                'redo',
+                'source',
+                '|',
+                'bold',
+                'underline',
+                'italic',
+                'strikethrough',
+                '|',
+                'align',
+                'indent',
+                'outdent',
+                'paragraph',
+                '|',
+                'ul',
+                'ol',
+                '|',
+                'font',
+                'fontsize',
+                'brush',
+                'lineHeight',
+                'superscript',
+                'subscript',
+                '|',
+                'image',
+                'hr',
+                'table',
+                'link',
+                'symbols',
+                '|',
+                'cut',
+                'copy',
+                'paste',
+                'selectall',
+                'copyformat',
+                'eraser',
+                '|',
+                'find',
+                'spellcheck',
+                'preview',
+                'fullsize'
+            ]
         };
     },
 
@@ -132,76 +180,15 @@ export default {
             return;
         }
 
-        this.content = this.ideaStore.idea.content;
-        tinymce.init({
-            selector: '#contentTextarea',
-            license_key: 'gpl',
-            language: 'fr_FR',
-            highlight_on_focus: false,
-            skin: 'tinymce-5',
-            branding: false,
-            promotion: false,
-            insertdatetime_formats: ['%H:%M:%S', '%d/%m/%Y', '%d/%m/%Y %H:%M:%S'],
-            quickbars_insert_toolbar: 'quicktable quicklink | hr pagebreak | bullist numlist',
-            contextmenu:
-                'alignleft aligncenter alignright alignjustify | bold italic underline strikethrough | forecolor backcolor fontsizes | image link table | selectall cut copy paste removeformat',
-            quickbars_selection_toolbar: 'bold italic underline strikethrough bullist quicklink blockquote quicktable',
-            toolbar:
-                'undo redo |' +
-                'blocks | fontsizeinput | bold italic underline strikethrough align | bullist numlist blockquote link quicktable |' +
-                'lineheight  outdent indent | forecolor backcolor |' +
-                'removeformat fullscreen help',
-            menu: {
-                file: {
-                    title: 'File',
-                    items: 'code wordcount | visualaid visualchars visualblocks | preview fullscreen | newdocument print '
-                },
-                edit: { title: 'Edit', items: 'undo redo | cut copy paste removeformat | selectall | searchreplace' },
-                insert: {
-                    title: 'Insert',
-                    items: 'image link media template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor toc | insertdatetime'
-                },
-                format: {
-                    title: 'Format',
-                    items: 'bold italic underline strikethrough superscript subscript codeformat | blocks fontfamily fontsize align lineheight | forecolor backcolor | removeformat'
-                },
-                table: { title: 'Table', items: 'inserttable | cell row column | tableprops deletetable' }
-            },
-            menubar: 'file format edit insert table',
-            plugins: [
-                'advlist',
-                'anchor',
-                'autolink',
-                'charmap',
-                'fullscreen',
-                'help',
-                'image',
-                'importcss',
-                'link',
-                'lists',
-                'media',
-                'nonbreaking',
-                'preview',
-                'quickbars',
-                'searchreplace',
-                'table',
-                'visualblocks',
-                'visualchars',
-                'wordcount',
-                'emoticons',
-                'insertdatetime'
-            ]
-        });
+        this.content = this.ideaStore.idea.content ? this.ideaStore.idea.content : '';
     },
 
     unmounted() {
-        tinymce.activeEditor.destroy();
         this.ideaStore.reset();
     },
 
     methods: {
         async save() {
-            this.content = tinymce.activeEditor.getContent('contentTextarea');
             const data = {
                 date: this.ideaStore.idea.date,
                 title: this.ideaStore.idea.title,
@@ -211,8 +198,7 @@ export default {
                 content: this.content,
                 note: this.ideaStore.idea.note,
                 status: this.ideaStore.idea.status,
-                sticky: this.ideaStore.idea.sticky,
-                todos: Array.from(this.ideaStore.idea.todos)
+                sticky: this.ideaStore.idea.sticky
             };
 
             const status = await this.ideaStore.update(data, this.ideaStore.idea._id);
@@ -225,3 +211,9 @@ export default {
     }
 };
 </script>
+
+<style>
+.jodit-status-bar-link {
+    display: none;
+}
+</style>

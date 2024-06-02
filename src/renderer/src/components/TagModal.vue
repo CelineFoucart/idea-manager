@@ -47,7 +47,7 @@ import { createToastify } from '@renderer/utils/toastify.js';
 export default {
     name: 'TagModal',
 
-    emits: ['on-close'],
+    emits: ['on-close', 'on-refresh'],
 
     data() {
         return {
@@ -109,6 +109,7 @@ export default {
                 createToastify("L'élément a été ajouté.", 'success');
                 this.newTag = null;
                 this.setData();
+                this.$emit('on-refresh');
             }
         },
 
@@ -119,6 +120,7 @@ export default {
                 createToastify('Ce tag ne peut être supprimé.', 'error');
             } else {
                 createToastify("L'élément a été supprimé.", 'success');
+                this.$emit('on-refresh');
             }
             this.setData();
         }

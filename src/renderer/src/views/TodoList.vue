@@ -13,7 +13,7 @@
                 </div>
             </div>
         </header>
-        <TagModal v-if="openTagModal" @on-close="openTagModal = false"></TagModal>
+        <TagModal v-if="openTagModal" @on-refresh="refreshTagsSelected" @on-close="openTagModal = false"></TagModal>
 
         <div class="card shadow-sm mt-4">
             <div class="card-header py-0">
@@ -233,7 +233,6 @@ export default {
                 if (todo.tag === null && this.noTag === false) {
                     continue;
                 }
-
                 if (this.activeTab === 'all') {
                     todos.push(todo);
                 } else if (this.activeTab === 'notDone' && todo.isDone === false) {
@@ -281,6 +280,9 @@ export default {
 
         progressPercentFormated() {
             const number = this.stats.percent.toFixed(2);
+            if (isNaN(number)) {
+                return '0,00%';
+            }
 
             return number.replace('.', ',') + '%';
         }
@@ -306,16 +308,18 @@ export default {
             createToastify('Le chargement des étiquettes a échoué.', 'error');
         }
 
-        this.selectedTags = {};
-        for (const key in this.tagStore.tags) {
-            const tag = this.tagStore.tags[key];
-            this.selectedTags[tag._id] = true;
-        }
-
-        console.log(this.selectedTags);
+        this.refreshTagsSelected();
     },
 
     methods: {
+        refreshTagsSelected() {
+            this.selectedTags = {};
+            for (const key in this.tagStore.tags) {
+                const tag = this.tagStore.tags[key];
+                this.selectedTags[tag._id] = true;
+            }
+        },
+
         async onAppend() {
             if (this.newTodo === null || this.newTodo.length < 2) {
                 createToastify('Le nom choisi est trop court.', 'error');
@@ -326,6 +330,7 @@ export default {
                 title: this.newTodo,
                 content: null,
                 isDone: false,
+                tag: null,
                 priority: 1
             };
 

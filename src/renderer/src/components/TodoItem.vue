@@ -98,6 +98,7 @@ export default {
                 title: this.todo.title,
                 content: this.todo.content,
                 isDone: this.isDone,
+                tag: this.todo.tag,
                 priority: this.todo.priority
             };
 
