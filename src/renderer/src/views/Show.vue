@@ -216,4 +216,8 @@ export default {
 .jodit-status-bar-link {
     display: none;
 }
+
+.jodit_sticky .jodit-toolbar-editor-collection {
+    margin-top: 60px;
+}
 </style>

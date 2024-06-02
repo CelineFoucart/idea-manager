@@ -14,7 +14,14 @@
                         </span>
                     </h2>
                 </header>
-                <div v-if="todo.content !== null" class="small" :class="{ 'todo-complete': isDone }">{{ todo.content }}</div>
+                <div
+                    v-if="todo.content !== null"
+                    class="small"
+                    style="white-space: pre-wrap"
+                    :class="{ 'todo-complete': isDone }"
+                >
+                    {{ todo.content }}
+                </div>
             </div>
             <div class="col-4 text-end">
                 <div class="btn-group">
