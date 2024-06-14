@@ -37,17 +37,6 @@
                             <div class="visually-hidden">Statistiques</div>
                         </router-link>
                     </li>
-                    <li class="nav-item pe-2">
-                        <router-link
-                            v-tooltip="'Gérer les catégories'"
-                            :to="{ name: 'category_index' }"
-                            class="nav-link"
-                            active-class="active"
-                        >
-                            <i class="bi bi-tags-fill"></i>
-                            <div class="visually-hidden">Gérer les catégories</div>
-                        </router-link>
-                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">

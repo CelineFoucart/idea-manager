@@ -350,5 +350,6 @@ export default {
 #tag-container {
     max-width: 300px;
     overflow-y: scroll;
+    max-height: 300px;
 }
 </style>

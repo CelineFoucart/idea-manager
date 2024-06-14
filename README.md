@@ -34,3 +34,8 @@ $ npm run build:mac
 # For Linux
 $ npm run build:linux
 ```
+
+## Todo
+
+* mettre à la place de composant un système de configuration des statuts d'idée affichée par défaut
+* ajouter le statut "en cours"

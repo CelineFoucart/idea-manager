@@ -8,26 +8,36 @@
                     <button type="button" class="btn-close" @click="close"></button>
                 </div>
                 <div class="modal-body">
-                    <div v-for="editedTag in editedTags" :key="editedTag._id" class="d-flex gap-2 mt-2">
-                        <button v-tooltip="'Retirer'" type="button" class="btn ps-0 pe-1" @click="performDelete(editedTag._id)">
-                            <i class="bi bi-x-lg text-danger"></i>
-                        </button>
-                        <div class="input-group">
-                            <input v-model="editedTag.name" type="text" class="form-control input-sm border-secondary" />
+                    <div v-for="editedTag in editedTags" :key="editedTag._id">
+                        <div class="input-group input-group-sm mt-2">
+                            <span class="input-group-text">
+                                <i class="bi bi-tag-fill"></i>
+                            </span>
+                            <input v-model="editedTag.name" type="text" class="form-control input-sm" />
                             <button
                                 v-tooltip="'Enregistrer'"
                                 type="button"
                                 class="btn btn-secondary btn-sm"
                                 @click="onEdit(editedTag._id)"
                             >
+                                <div class="visually-hidden">Editer</div>
                                 <i class="bi bi-pencil-fill"></i>
+                            </button>
+                            <button
+                                v-tooltip="'Retirer'"
+                                type="button"
+                                class="btn btn-danger btn-sm"
+                                @click="performDelete(editedTag._id)"
+                            >
+                                <i class="bi bi-trash3-fill"></i>
+                                <span class="visually-hidden">Supprimer</span>
                             </button>
                         </div>
                     </div>
                     <div v-if="isEmpty" class="text-muted text-center">Il n'y a pas d'étiquettes.</div>
                 </div>
                 <div class="modal-footer bg-light">
-                    <div class="input-group py-2">
+                    <div class="input-group input-group-sm">
                         <input v-model="newTag" type="text" class="form-control input-sm" placeholder="Créer une étiquette" />
                         <button v-tooltip="'Ajouter'" class="btn btn-success font-weight-bold btn-sm" @click="onAppend">
                             <i class="bi bi-plus-lg"></i>

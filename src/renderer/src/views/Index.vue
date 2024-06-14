@@ -1,134 +1,156 @@
 <template>
     <article>
         <header class="mb-4">
-            <h1 class="display-3 fw-normal mb-1">Liste des idées</h1>
-            <p class="fs-5 fw-normal text-muted">Retrouvez et fitrez les idées que vous avez ajoutées à l'application.</p>
+            <div class="row align-items-center">
+                <div class="col-7">
+                    <h1 class="display-3 mb-0 fw-normal mb-1">Liste des idées</h1>
+                </div>
+                <div class="col-5 text-end">
+                    <button type="button" class="btn btn-dark" @click="openCategoriesModal = true">
+                        <i class="bi bi-tag-fill"></i>
+                        Catégories
+                    </button>
+                </div>
+                <div class="col-12">
+                    <p class="fs-5 fw-normal text-muted">Retrouvez et fitrez les idées que vous avez ajoutées à l'application.</p>
+                </div>
+            </div>
+            <CategoriesModal v-if="openCategoriesModal" @on-refresh="getCategories" @on-close="openCategoriesModal = false" />
         </header>
 
-        <aside class="mb-1 text-end">
-            <button class="btn btn-sm btn-success" @click="onShowEditModal(null)">
-                <i class="bi bi-plus-lg"></i>
-                Ajouter
-            </button>
-        </aside>
-
-        <div class="card shadow-sm">
+        <!-- onglets navigation au-dessus de la carte et enlever du top menu lien stats -->
+        <!-- tabs liste des idées -->
+        <!-- tabs stats des idées -->
+        <section class="card shadow-sm">
             <div class="card-header">
-                <div class="row">
-                    <div class="col-8 d-flex align-items-center gap-2">
-                        <span class="fw-bold">Statut</span>
-                        <VueMultiselect
-                            v-model="statusSelected"
-                            :options="optionsStatus"
-                            :allow-empty="false"
-                            :multiple="true"
-                            :close-on-select="true"
-                            placeholder="Choisir les statuts"
-                            select-label="Appuyer sur entrée pour choisir"
-                            selected-label="Sélectionné"
-                            deselect-label="Appuyer sur entrée pour enlever"
-                            label="name"
-                            track-by="code"
-                        />
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <h2 class="h5 mb-0">Idées</h2>
                     </div>
                     <div class="col-4 text-end">
-                        <div class="btn btn-group pe-0">
-                            <button
-                                v-tooltip="'Réinitialiser les filtres'"
-                                type="button"
-                                class="btn btn-outline-secondary"
-                                @click="reset"
-                            >
-                                <i class="bi bi-arrow-repeat"></i>
-                            </button>
-                            <button
-                                v-tooltip="'Filtres avancées'"
-                                type="button"
-                                class="btn btn-outline-secondary"
-                                @click="showAdvancedFilters = !showAdvancedFilters"
-                            >
-                                <i v-if="showAdvancedFilters === false" class="bi bi-eye-fill"></i>
-                                <i v-if="showAdvancedFilters === true" class="bi bi-eye-slash-fill"></i>
-                            </button>
-                        </div>
+                        <button class="btn btn-sm btn-success" @click="onShowEditModal(null)">
+                            <i class="bi bi-plus-lg"></i>
+                            Ajouter
+                        </button>
                     </div>
                 </div>
-                <div v-if="showAdvancedFilters" class="row">
-                    <div class="col-12"><hr class="my-3" /></div>
-                    <div class="col-md-4 d-flex align-items-center gap-2">
-                        <label for="daterange" class="fw-bold">Période</label>
-                        <VueDatePicker
-                            id="daterange"
-                            v-model="dates"
-                            locale="fr"
-                            :format="format"
-                            auto-apply
-                            :enable-time-picker="false"
-                            range
-                        ></VueDatePicker>
-                    </div>
-                    <div class="col-md-4 d-flex align-items-center gap-2">
-                        <label for="daterange" class="fw-bold">Note</label>
-                        <div class="input-group">
-                            <span class="input-group-text">Min</span>
-                            <input v-model="minNote" min="0" max="5" type="number" class="form-control" />
-                            <span class="input-group-text">Max</span>
-                            <input v-model="maxNote" min="0" max="5" type="number" class="form-control" />
+            </div>
+            <div class="card-body">
+                <div>
+                    <div class="row">
+                        <div class="col-8 d-flex align-items-center gap-2">
+                            <span class="first-label">Statut</span>
+                            <VueMultiselect
+                                v-model="statusSelected"
+                                :options="optionsStatus"
+                                :allow-empty="false"
+                                :multiple="true"
+                                :close-on-select="true"
+                                placeholder="Choisir les statuts"
+                                select-label="Appuyer sur entrée pour choisir"
+                                selected-label="Sélectionné"
+                                deselect-label="Appuyer sur entrée pour enlever"
+                                label="name"
+                                track-by="code"
+                            />
+                        </div>
+                        <div class="col-4 text-end">
+                            <div class="btn btn-group pe-0">
+                                <button
+                                    v-tooltip="'Réinitialiser les filtres'"
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    @click="reset"
+                                >
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </button>
+                                <button
+                                    v-tooltip="'Filtres avancées'"
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    @click="showAdvancedFilters = !showAdvancedFilters"
+                                >
+                                    <i v-if="showAdvancedFilters === false" class="bi bi-eye-fill"></i>
+                                    <i v-if="showAdvancedFilters === true" class="bi bi-eye-slash-fill"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="dropdown h-100">
-                            <button
-                                class="btn btn-outline-success h-100 w-100 dropdown-toggle"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                Catégories
-                            </button>
-                            <div class="dropdown-menu w-100">
-                                <div class="form-check ms-2">
-                                    <input id="checkAll" v-model="checkAll" class="form-check-input" type="checkbox" />
-                                    <label class="form-check-label fw-bold" for="checkAll"> Tout cocher</label>
-                                </div>
-                                <div class="p-2">
-                                    <input
-                                        id="search"
-                                        v-model="categorySearch"
-                                        type="text"
-                                        class="form-control"
-                                        placeholder="filtrer..."
-                                    />
-                                </div>
-                                <hr class="mb-0 mt-2" size />
-                                <div class="categoryContainer pt-2">
-                                    <div class="form-check ms-3">
-                                        <input
-                                            id="check0"
-                                            v-model="selectedCategories['0']"
-                                            class="form-check-input"
-                                            type="checkbox"
-                                        />
-                                        <label class="form-check-label fw-bold" for="check0">Sans catégorie</label>
+                    <div v-if="showAdvancedFilters" class="row">
+                        <div class="col-md-4 d-flex align-items-center gap-2">
+                            <label for="daterange" class="first-label">Période</label>
+                            <VueDatePicker
+                                id="daterange"
+                                v-model="dates"
+                                locale="fr"
+                                :format="format"
+                                auto-apply
+                                :enable-time-picker="false"
+                                range
+                            ></VueDatePicker>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center gap-2">
+                            <label for="daterange">Note</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Min</span>
+                                <input v-model="minNote" min="0" max="5" type="number" class="form-control" />
+                                <span class="input-group-text">Max</span>
+                                <input v-model="maxNote" min="0" max="5" type="number" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="dropdown h-100">
+                                <button
+                                    class="btn btn-outline-success h-100 w-100 dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    Catégories
+                                </button>
+                                <div class="dropdown-menu w-100">
+                                    <div class="form-check ms-2">
+                                        <input id="checkAll" v-model="checkAll" class="form-check-input" type="checkbox" />
+                                        <label class="form-check-label fw-bold" for="checkAll"> Tout cocher</label>
                                     </div>
-                                    <div v-for="category in categories" :key="category._id" class="form-check ms-3">
+                                    <div class="p-2">
                                         <input
-                                            :id="'check' + category._id"
-                                            v-model="selectedCategories[category._id]"
-                                            class="form-check-input"
-                                            type="checkbox"
+                                            id="search"
+                                            v-model="categorySearch"
+                                            type="text"
+                                            class="form-control"
+                                            placeholder="filtrer..."
                                         />
-                                        <label class="form-check-label" :for="'check' + category._id">
-                                            {{ category.name }}
-                                        </label>
+                                    </div>
+                                    <hr class="mb-0 mt-2" size />
+                                    <div class="categoryContainer pt-2">
+                                        <div class="form-check ms-3">
+                                            <input
+                                                id="check0"
+                                                v-model="selectedCategories['0']"
+                                                class="form-check-input"
+                                                type="checkbox"
+                                            />
+                                            <label class="form-check-label fw-bold" for="check0">Sans catégorie</label>
+                                        </div>
+                                        <div v-for="category in categories" :key="category._id" class="form-check ms-3">
+                                            <input
+                                                :id="'check' + category._id"
+                                                v-model="selectedCategories[category._id]"
+                                                class="form-check-input"
+                                                type="checkbox"
+                                            />
+                                            <label class="form-check-label" :for="'check' + category._id">
+                                                {{ category.name }}
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <hr class="my-3" />
                 </div>
-            </div>
-            <div class="card-body">
                 <DataTable
                     :columns="columns"
                     :data="ideas"
@@ -178,7 +200,7 @@
                     </template>
                 </DataTable>
             </div>
-        </div>
+        </section>
         <IdeaModal v-if="editModal" :idea="idea" @on-close="editModal = false"></IdeaModal>
         <DeleteModal
             v-if="deleteModal"
@@ -207,6 +229,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import StatusIdea from '../components/StatusIdea.vue';
 import VueMultiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.css';
+import CategoriesModal from '../components/CategoriesModal.vue';
 dayjs.extend(isBetween);
 
 DataTable.use(DataTablesCore);
@@ -220,7 +243,8 @@ export default {
         DeleteModal,
         VueDatePicker,
         StatusIdea,
-        VueMultiselect
+        VueMultiselect,
+        CategoriesModal
     },
 
     mixins: [datetimeMixin],
@@ -249,7 +273,8 @@ export default {
             options: { language: language },
             idea: null,
             editModal: false,
-            deleteModal: false
+            deleteModal: false,
+            openCategoriesModal: false
         };
     },
 
@@ -354,17 +379,7 @@ export default {
             createToastify('La récupération des données a échoué', 'error');
         }
 
-        const statusCategories = await this.categoryStore.getCategories();
-        if (!statusCategories) {
-            createToastify('La récupération des catégories a échoué', 'error');
-        }
-
-        this.selectedCategories['0'] = true;
-        for (const key in this.categoryStore.categories) {
-            this.selectedCategories[key] = true;
-        }
-
-        this.checkAll = true;
+        await this.getCategories();
     },
 
     unmounted() {
@@ -372,6 +387,20 @@ export default {
     },
 
     methods: {
+        async getCategories() {
+            const statusCategories = await this.categoryStore.getCategories();
+            if (!statusCategories) {
+                createToastify('La récupération des catégories a échoué', 'error');
+            }
+
+            this.selectedCategories['0'] = true;
+            for (const key in this.categoryStore.categories) {
+                this.selectedCategories[key] = true;
+            }
+
+            this.checkAll = true;
+        },
+
         hydrateStatutSelected() {
             this.optionsStatus = [];
             this.statusSelected = [];
@@ -448,5 +477,9 @@ table.dataTable td.dt-type-date {
 .categoryContainer {
     max-height: 150px;
     overflow-y: scroll;
+}
+
+.first-label {
+    flex: 0 0 60px;
 }
 </style>
