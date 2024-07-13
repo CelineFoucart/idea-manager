@@ -1,39 +1,34 @@
 <template>
-    <article>
-        <header class="mb-4">
-            <h1 class="display-3 fw-normal mb-1">Statistiques des idées</h1>
+    <article class="card shadow-sm">
+        <header class="card-header">
+            <h2 class="h5 mb-0">Statistiques des idées</h2>
         </header>
-
-        <div class="row g-2">
-            <div class="col-lg-6">
-                <section class="card shadow-sm">
-                    <div class="card-header">
-                        <h2 class="fs-5 card-title">Idées par année</h2>
-                    </div>
-                    <div class="card-body">
-                        <Bar :data="barYearData" :options="options" :style="stylesGraph"></Bar>
-                    </div>
-                </section>
-            </div>
-            <div class="col-lg-6">
-                <section class="card shadow-sm">
-                    <div class="card-header">
-                        <h2 class="fs-5 card-title">Idées par catégorie</h2>
-                    </div>
-                    <div class="card-body">
-                        <Bar :data="barCategoryData" :options="options" :style="stylesGraph"></Bar>
-                    </div>
-                </section>
-            </div>
-            <div class="col-lg-12">
-                <section class="card shadow-sm">
-                    <div class="card-header">
-                        <h2 class="fs-5 card-title">Idées par statut</h2>
-                    </div>
-                    <div class="card-body">
-                        <Pie :data="byStatus" :options="optionsPie" :style="stylesGraph"></Pie>
-                    </div>
-                </section>
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-lg-6">
+                    <section>
+                        <h2 class="fs-5">Idées par année</h2>
+                        <div class="border p-2 rounded">
+                            <Bar :data="barYearData" :options="options" :style="stylesGraph"></Bar>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-lg-6">
+                    <section>
+                        <h2 class="fs-5">Idées par catégorie</h2>
+                        <div class="border p-2 rounded">
+                            <Bar :data="barCategoryData" :options="options" :style="stylesGraph"></Bar>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-lg-12">
+                    <section class="mt-2">
+                        <h2 class="fs-5">Idées par statut</h2>
+                        <div class="border p-2 rounded">
+                            <Pie :data="byStatus" :options="optionsPie" :style="stylesGraph"></Pie>
+                        </div>
+                    </section>
+                </div>
             </div>
         </div>
     </article>
@@ -43,7 +38,6 @@
 import { mapStores } from 'pinia';
 import { useIdeaStore } from '@renderer/stores/idea';
 import { useCategoryStore } from '@renderer/stores/category';
-import { createToastify } from '@renderer/utils/toastify';
 import dayjs from 'dayjs';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title, BarElement, CategoryScale, LinearScale } from 'chart.js';
 import { Pie, Bar } from 'vue-chartjs';
@@ -134,17 +128,7 @@ export default {
         }
     },
 
-    async mounted() {
-        const status = await this.ideaStore.getIdeas();
-        if (!status) {
-            createToastify('La récupération des données a échoué', 'error');
-        }
-
-        const statusCategories = await this.categoryStore.getCategories();
-        if (!statusCategories) {
-            createToastify('La récupération des catégories a échoué', 'error');
-        }
-
+    mounted() {
         this.setData();
     },
 

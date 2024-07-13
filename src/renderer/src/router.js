@@ -1,7 +1,6 @@
 import Dashboard from './views/Dashboard.vue';
 import Index from './views/Index.vue';
 import Show from './views/Show.vue';
-import Statistics from './views/Statistics.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import TodoList from './views/TodoList.vue';
 
@@ -27,11 +26,6 @@ export default new createRouter({
             path: `/task`,
             name: 'task_index',
             component: TodoList
-        },
-        {
-            path: '/statistics',
-            name: 'stats',
-            component: Statistics
         }
     ]
 });

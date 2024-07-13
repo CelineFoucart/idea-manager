@@ -21,7 +21,7 @@
                             class="nav-link"
                             active-class="active"
                         >
-                            <i class="bi bi-table"></i>
+                            <i class="bi bi-file-text-fill"></i>
                             <div class="visually-hidden">Liste des idées</div>
                         </router-link>
                     </li>
@@ -29,12 +29,6 @@
                         <router-link v-tooltip="'Tâches'" :to="{ name: 'task_index' }" class="nav-link" active-class="active">
                             <i class="bi bi-list-task"></i>
                             <div class="visually-hidden">Tâches</div>
-                        </router-link>
-                    </li>
-                    <li class="nav-item pe-2">
-                        <router-link v-tooltip="'Statistiques'" :to="{ name: 'stats' }" class="nav-link" active-class="active">
-                            <i class="bi bi-bar-chart-line-fill"></i>
-                            <div class="visually-hidden">Statistiques</div>
                         </router-link>
                     </li>
                 </ul>
