@@ -156,7 +156,7 @@ export default {
             description: null,
             category: null,
             note: '0',
-            status: { value: '0', label: 'En brouillon' },
+            status: { value: '0', label: 'en brouillon' },
             v$: useVuelidate()
         };
     },

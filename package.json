@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Une application de gestion d'idées",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": "Celine Foucart",
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",

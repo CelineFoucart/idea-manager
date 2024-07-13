@@ -1,9 +1,12 @@
 import Datastore from '@seald-io/nedb';
+import { join } from 'path';
 
-const ideaDB = new Datastore({ filename: 'data/ideas.db', autoload: true });
-const categoryDB = new Datastore({ filename: 'data/categories.db', autoload: true });
-const todoDB = new Datastore({ filename: 'data/todos.db', autoload: true });
-const tagDB = new Datastore({ filename: 'data/tags.db', autoload: true });
+const DATA_FOLDER = join(require('os').homedir(), '/.idea-manager');
+
+const ideaDB = new Datastore({ filename: join(DATA_FOLDER, 'ideas.db'), autoload: true });
+const categoryDB = new Datastore({ filename: join(DATA_FOLDER, 'categories.db'), autoload: true });
+const todoDB = new Datastore({ filename: join(DATA_FOLDER, 'todos.db'), autoload: true });
+const tagDB = new Datastore({ filename: join(DATA_FOLDER, 'tags.db'), autoload: true });
 
 /**
  * Custom APIs for renderer

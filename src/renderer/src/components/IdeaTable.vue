@@ -219,7 +219,7 @@ export default {
 
     data() {
         return {
-            statusNames: ['en brouillon', 'à faire', 'validé', 'annulé', 'En cours'],
+            statusNames: ['en brouillon', 'à faire', 'validé', 'annulé', 'en cours'],
             showAdvancedFilters: false,
             optionsStatus: [],
             statusSelected: {},
@@ -346,7 +346,7 @@ export default {
         getStatusInStorage() {
             let selectedFromStorage = localStorage.getItem('status-selected');
             if (selectedFromStorage === null) {
-                selectedFromStorage = [0, 1, 2, 4];
+                selectedFromStorage = ['0', '1', '2', '4'];
                 localStorage.setItem('status-selected', selectedFromStorage);
 
                 return selectedFromStorage;
