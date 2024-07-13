@@ -30,6 +30,8 @@
                             deselect-label="Appuyer sur entrée pour enlever"
                             label="name"
                             track-by="code"
+                            @select="onSelect"
+                            @remove="onRemove"
                         />
                     </div>
                     <div class="col-4 text-end">
@@ -341,6 +343,32 @@ export default {
     },
 
     methods: {
+        getStatusInStorage() {
+            let selectedFromStorage = localStorage.getItem('status-selected');
+            if (selectedFromStorage === null) {
+                selectedFromStorage = [0, 1, 2, 4];
+                localStorage.setItem('status-selected', selectedFromStorage);
+
+                return selectedFromStorage;
+            }
+
+            return selectedFromStorage.split(',');
+        },
+
+        onSelect(selectedOption) {
+            const selectedId = selectedOption.code;
+            const currentStorage = this.getStatusInStorage();
+            currentStorage.push(`${selectedId}`);
+            localStorage.setItem('status-selected', currentStorage);
+        },
+
+        onRemove(removedOption) {
+            const selectedId = removedOption.code;
+            let currentStorage = this.getStatusInStorage();
+            currentStorage = currentStorage.filter((e) => e !== `${selectedId}`);
+            localStorage.setItem('status-selected', currentStorage);
+        },
+
         getCategories() {
             this.selectedCategories['0'] = true;
             for (const key in this.categoryStore.categories) {
@@ -351,12 +379,15 @@ export default {
         },
 
         hydrateStatutSelected() {
+            let selectedFromStorage = this.getStatusInStorage();
+
             this.optionsStatus = [];
             this.statusSelected = [];
             for (let i = 0; i < this.statusNames.length; i++) {
                 const option = { name: this.statusNames[i], code: i };
                 this.optionsStatus.push(option);
-                if (i != 3) {
+
+                if (selectedFromStorage.includes(`${i}`)) {
                     this.statusSelected.push(option);
                 }
             }
