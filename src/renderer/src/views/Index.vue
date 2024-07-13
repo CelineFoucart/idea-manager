@@ -15,7 +15,7 @@
                     <p class="fs-5 fw-normal text-muted">Retrouvez et fitrez les idées que vous avez ajoutées à l'application.</p>
                 </div>
             </div>
-            <CategoriesModal v-if="openCategoriesModal" @on-refresh="getCategories" @on-close="openCategoriesModal = false" />
+            <CategoriesModal v-if="openCategoriesModal" @on-close="openCategoriesModal = false" />
         </header>
 
         <div v-if="loading === false">

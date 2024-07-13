@@ -99,12 +99,13 @@ export default {
         },
 
         async onEdit(category) {
+            console.log(category);
             if (this.editedCategories[category].name === null || this.editedCategories[category].name.length < 2) {
                 createToastify('Le nom choisi est trop court.', 'error');
                 return;
             }
 
-            const status = await this.categoryStore.update({ name: this.name }, this.data._id);
+            const status = await this.categoryStore.update({ name: this.editedCategories[category].name }, category);
             if (status === false) {
                 createToastify("L'opération a échoué", 'error');
             } else {
