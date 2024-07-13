@@ -4,7 +4,7 @@ dayjs.locale('fr');
 
 export const datetimeMixin = {
     methods: {
-        formatDateTime: function (datetime, format = 'DD/MM/YYYY HH:mm') {
+        formatDateTime: function (datetime, format = 'DD/MM/YYYY') {
             return dayjs(datetime).format(format);
         }
     }
