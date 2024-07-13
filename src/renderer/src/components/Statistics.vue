@@ -56,7 +56,7 @@ export default {
             yearLabels: [],
             yearData: [],
             categoryData: {},
-            statusData: { 0: 0, 1: 0, 2: 0, 3: 0 },
+            statusData: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 },
             options: {
                 responsive: false,
                 maintainAspectRatio: true,
@@ -117,10 +117,10 @@ export default {
 
         byStatus() {
             return {
-                labels: ['en brouillon', 'à faire', 'validé', 'annulé'],
+                labels: ['en brouillon', 'à faire', 'validé', 'annulé', 'en cours'],
                 datasets: [
                     {
-                        backgroundColor: ['#6c757d', '#fd7e14', '#198754', '#dc3545'],
+                        backgroundColor: ['#6c757d', '#fd7e14', '#198754', '#dc3545', '#0d6efd'],
                         data: Object.values(this.statusData)
                     }
                 ]
@@ -136,7 +136,7 @@ export default {
         setData() {
             this.yearLabels = [];
             const yearData = {};
-            const statusData = { 0: 0, 1: 0, 2: 0, 3: 0 };
+            const statusData = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 };
             const dataCategory = {};
 
             this.ideaStore.ideas.forEach((idea) => {

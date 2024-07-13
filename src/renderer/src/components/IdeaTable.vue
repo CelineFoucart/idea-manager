@@ -217,7 +217,7 @@ export default {
 
     data() {
         return {
-            statusNames: ['en brouillon', 'à faire', 'validé', 'annulé'],
+            statusNames: ['en brouillon', 'à faire', 'validé', 'annulé', 'En cours'],
             showAdvancedFilters: false,
             optionsStatus: [],
             statusSelected: {},
@@ -356,7 +356,7 @@ export default {
             for (let i = 0; i < this.statusNames.length; i++) {
                 const option = { name: this.statusNames[i], code: i };
                 this.optionsStatus.push(option);
-                if (i < 3) {
+                if (i != 3) {
                     this.statusSelected.push(option);
                 }
             }

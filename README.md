@@ -38,4 +38,3 @@ $ npm run build:linux
 ## Todo
 
 * mettre à la place du composant stats un système de configuration des statuts d'idée affichée par défaut
-* ajouter le statut "en cours"

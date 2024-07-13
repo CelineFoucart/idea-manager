@@ -21,7 +21,7 @@ export default {
 
     data() {
         return {
-            statusNames: ['en brouillon', 'à faire', 'validé', 'annulé']
+            statusNames: ['en brouillon', 'à faire', 'validé', 'annulé', 'en cours']
         };
     },
 
@@ -30,16 +30,18 @@ export default {
             if (parseInt(this.status) == 0) {
                 return 'text-bg-secondary';
             } else if (parseInt(this.status) == 1) {
-                return 'text-bg-primary';
+                return 'text-bg-warning';
             } else if (parseInt(this.status) == 2) {
                 return 'text-bg-success';
+            } else if (parseInt(this.status) == 4) {
+                return 'text-bg-primary';
             } else {
                 return 'text-bg-danger';
             }
         },
 
         statusName() {
-            if (parseInt(this.status) >= 0 || parseInt(this.status) < 4) {
+            if (parseInt(this.status) >= 0 || parseInt(this.status) < 5) {
                 return this.statusNames[parseInt(this.status)];
             }
 

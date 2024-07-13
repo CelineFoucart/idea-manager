@@ -143,7 +143,7 @@ export default {
         },
 
         statusName() {
-            const statusNames = ['en brouillon', 'à faire', 'validé', 'annulé'];
+            const statusNames = ['en brouillon', 'à faire', 'validé', 'annulé', 'en cours'];
 
             if (parseInt(this.ideaStore.idea.status) >= 0 || parseInt(this.ideaStore.idea.status) < 4) {
                 return statusNames[parseInt(this.ideaStore.idea.status)];

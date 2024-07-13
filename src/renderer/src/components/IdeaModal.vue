@@ -170,10 +170,11 @@ export default {
 
         statusOptions() {
             return [
-                { value: '0', label: 'En brouillon' },
-                { value: '1', label: 'A faire' },
-                { value: '2', label: 'Validé' },
-                { value: '3', label: 'Annulé' }
+                { value: '0', label: 'en brouillon' },
+                { value: '1', label: 'à faire' },
+                { value: '2', label: 'validé' },
+                { value: '3', label: 'annulé' },
+                { value: '4', label: 'en cours' }
             ];
         }
     },
