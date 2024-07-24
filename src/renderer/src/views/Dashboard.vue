@@ -74,6 +74,11 @@ export default {
         if (!status) {
             createToastify('La récupération des données a échoué.', 'error');
         }
+
+        const statusCategories = await this.categoryStore.getCategories();
+        if (!statusCategories) {
+            createToastify('La récupération des catégories a échoué', 'error');
+        }
     },
 
     unmounted() {
